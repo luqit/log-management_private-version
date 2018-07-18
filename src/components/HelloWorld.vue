@@ -7,15 +7,14 @@
                 <Menu mode="horizontal" theme="dark" active-name="1">
                     <div class="layout-logo"><img src="@/assets/icon-iflytek.png"></div>
                     <div class="layout-nav">
-                        <MenuItem name="1" style="border-right: 1px solid white; height: 50%">
+                        <MenuItem name="1" style="border-right: 1px solid white; height: 40px; top: 10px; line-height: 45px;">
                             <Icon type="ios-navigate"></Icon>
                             我的账户
                         </MenuItem>
-                        <MenuItem name="2">
+                        <MenuItem name="2" style="height: 40px; top: 10px; line-height: 45px;">
                             <Icon type="ios-keypad"></Icon>
                             退出
                         </MenuItem>
-                        </MenuItem> -->
                     </div>
                 </Menu>
             </Header>
@@ -79,7 +78,7 @@
 </template>
 
 
-  </div>
+</div>
 </template>
 
 <script>
@@ -136,8 +135,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1,
-h2 {
+h1,h2 {
   font-weight: normal;
 }
 ul {
@@ -148,14 +146,11 @@ li {
   display: inline-block;
   margin: 0 10px;
 }
-a {
-  color: #42b983;
-}
 
 .layout {
   border: 1px solid #d7dde4;
   background: #f5f7f9;
-  position: relative;
+  /* position: relative; */
   border-radius: 4px;
   overflow: hidden;
 }
@@ -175,7 +170,6 @@ a {
   margin-right: 10px;
   right: 20px;
 }
-
 .card{
   margin: 15px;
   width: 300px;

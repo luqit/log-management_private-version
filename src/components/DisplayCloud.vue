@@ -1,16 +1,17 @@
 <template>    
 <div>
-    <template>  
+    <div id="container">
+    <template>
+        <div>  
         <Tabs :animated="false">
             <TabPane label="公有云"></TabPane>
             <TabPane label="私有云"></TabPane>
             <TabPane label="总计"></TabPane>
         </Tabs>
+        </div>
     </template>
 
     <template>
-        <div id="container">
-
             <div id="location">
                 <span>省份</span>
                 <Select v-model="model2" size="large" style="width:100px" placeholder="">
@@ -45,8 +46,9 @@
                 <Button type="ghost">搜索</Button>
             </div>
 
-        </div>
+        
     </template>
+    </div>
 
 </div>
 </template>
@@ -109,9 +111,10 @@
 </script>
 
 <style scoped>
-    /* #container {
-        position: absolute;
-    }  */
+    #location, #time {
+        margin-left: 10px;
+        text-align: left;
+    }
 
     #time {    
         margin: 30px;    
