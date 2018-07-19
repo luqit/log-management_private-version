@@ -19,20 +19,18 @@
                 </Menu>
             </Header>
             <Layout>
-                <Sider hide-trigger :style="{background: '#fff'}">
-                    <Menu active-name="1-2" theme="light" width="auto" :open-names="['1']">
+                <Sider hide-trigger :style="{background: '#e3eff9'}">
+                    <Menu active-name="1-2" theme="light" width="auto" style="height: 500px; width:300px; font-size: 16px;" :open-names="['1']">
                         <Submenu name="1">
                           <template slot="title">
                               <Icon type="ios-navigate"></Icon>
                               首页
                           </template>
-                          <MenuItem name="1-1">使用总量统计</MenuItem>
-                          <MenuItem name="1-2">医院使用统计</MenuItem>
-                          <MenuItem name="1-3">科室使用统计</MenuItem>
+                          <MenuItem name="log" class="submenu"  @on-select="addUrl">使用总量统计</MenuItem>
+                          <MenuItem name="1-2" class="submenu">医院使用统计</MenuItem>
+                          <MenuItem name="1-3" class="submenu">科室使用统计</MenuItem>
                         </Submenu>
-                        <!-- <MenuItem name="2">使用总量统计</MenuItem>
-                        <MenuItem name="3">医院使用统计</MenuItem> -->
-                        <Submenu name="2">
+                        <Submenu name="log" @on-select="addUrl">
                           <template slot="title">
                               <Icon type="ios-keypad"></Icon>
                               日志管理
@@ -46,8 +44,8 @@
                         </Submenu>
                     </Menu>
                 </Sider>
-                <Layout :style="{padding: '0 24px 24px'}">
-                    <Content :style="{padding: '24px', minHeight: '1000px', background: '#fff'}">
+                <Layout :style="{padding: '0 0'}">
+                    <Content :style="{padding: '24px 180px', minHeight: '1000px', background: '#e3eff9'}">
                       <template>
                         <Row :gutter="16">
                           <Col span="6"  v-for="( value , index) in usage" :key='index'>
@@ -129,6 +127,13 @@ export default {
   components: {
     DisplayCloud,
     DisplayUsage,
+  },
+
+  methods: {
+    addUrl(name){
+        this.$route.push({path:'/log'});
+        console.log(name);
+    }
   }
 };
 </script>
@@ -162,16 +167,18 @@ li {
   float: left;
   position: relative;
   top: 11px;
-  left: 20px;
+  /* left: 20px; */
 }
 .layout-nav {
-  width: 420px;
-  margin: 0 auto;
-  margin-right: 10px;
-  right: 20px;
+  width: 380px;
+  float: right;
 }
 .card{
   margin: 15px;
   width: 300px;
+}
+
+.submenu {
+  font-size: 16px;
 }
 </style>

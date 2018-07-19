@@ -4,7 +4,7 @@
     <template>
         <div>  
         <Tabs :animated="false">
-            <TabPane label="公有云"></TabPane>
+            <TabPane label="公有云" width="300px"></TabPane>
             <TabPane label="私有云"></TabPane>
             <TabPane label="总计"></TabPane>
         </Tabs>
@@ -13,10 +13,10 @@
 
     <template>
             <div id="location">
-                <span>省份</span>
+                <span>省份
                 <Select v-model="model2" size="large" style="width:100px" placeholder="">
                     <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                </Select>
+                </Select></span>
                 <span>市区</span>
                 <Select v-model="model3" size="large" style="width:100px" placeholder="">
                     <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
@@ -117,7 +117,7 @@
     }
 
     #time {    
-        margin: 30px;    
+        margin: 30px 10px;    
     }
 
 
