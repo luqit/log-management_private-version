@@ -1,36 +1,35 @@
 <template>
   <div class="hello">
-    <template>
+
     <div class="layout">
         <Layout>
-            <Header style="height: 70px;">
-                <Menu mode="horizontal" theme="dark" active-name="1">
+            <Header style="height: 70px; background: #19385f;">
+                <Menu mode="horizontal" theme="dark" active-name="1" style="background: #19385f;">
                     <div class="layout-logo"><img src="@/assets/icon-iflytek.png"></div>
                     <div class="layout-nav">
-                        <MenuItem name="1" style="border-right: 1px solid white; height: 40px; top: 10px; line-height: 45px;">
-                            <Icon type="ios-navigate"></Icon>
-                            我的账户
+                        <MenuItem name="1" style="border-right: 1px solid white; height: 40px; top: 15px; line-height: 45px; color: white; text-align: center;">
+                          <img src="@/assets/user-normal.png">
+                          我的账户
                         </MenuItem>
-                        <MenuItem name="2" style="height: 40px; top: 10px; line-height: 45px;">
-                            <Icon type="ios-keypad"></Icon>
+                        <MenuItem name="2" style="height: 40px; top: 15px; line-height: 45px; padding-left: 0px;">
                             退出
                         </MenuItem>
                     </div>
                 </Menu>
             </Header>
             <Layout>
-                <Sider hide-trigger :style="{background: '#e8f4fe'}">
-                    <Menu active-name="1-2" theme="light" width="auto" style="height: 500px; width:300px; font-size: 16px;" :open-names="['1']">
+                <Sider width="260px" hide-trigger :style="{background: '#e8f4fe', minWidth: '260px'}">
+                    <Menu active-name="1-2" theme="light" width="auto" style="height: 500px; width:260px; font-size: 16px;" :open-names="['1']">
                         <Submenu name="1">
                           <template slot="title">
                               <Icon type="ios-navigate"></Icon>
                               首页
                           </template>
-                          <MenuItem name="log" class="submenu"  @on-select="goRoute('/log')">使用总量统计</MenuItem>
+                          <MenuItem class="submenu" name="log" >使用总量统计</MenuItem>
                           <MenuItem name="1-2" class="submenu">医院使用统计</MenuItem>
                           <MenuItem name="1-3" class="submenu">科室使用统计</MenuItem>
                         </Submenu>
-                        <Submenu name="log">
+                        <Submenu name="2">
                           <template slot="title">
                               <Icon type="ios-keypad"></Icon>
                               日志管理
@@ -45,10 +44,10 @@
                     </Menu>
                 </Sider>
                 <Layout :style="{padding: '0 0'}">
-                    <Content :style="{padding: '24px 180px', minHeight: '1000px', background: '#e8f4fe'}">
+                    <Content :style="{padding: '14px 66px 0px 40px', minHeight: '1000px', minWidth: '1106px', background: '#e8f4fe'}">
                       <template>
                         <Row :gutter="16">
-                          <Col span="6"  v-for="( value , index) in usage" :key='index'>
+                          <Col span="6"  v-for="( value , index) in usage" :key='index' style="padding: 0px 0px;">
                               <Card class="card">
                                   <div>{{value.name}}</div>
                                   <img :src='value.link'>
@@ -56,7 +55,7 @@
                           </Col>
                         </Row>
                         <Row :gutter="16">
-                          <Col span="6"  v-for="( value , index) in totalInput" :key='index'>
+                          <Col span="6"  v-for="( value , index) in totalInput" :key='index' style="padding: 0px 0px;">
                               <Card class="card">
                                   <div>{{value.name}}</div>
                                   <img :src=value.link>
@@ -72,17 +71,12 @@
             </Layout>
         </Layout>
     </div>
-    
-</template>
-
-
 </div>
 </template>
 
 <script>
 import DisplayCloud from "./DisplayCloud.vue";
 import DisplayUsage from "./DisplayUsage.vue";
-
 
 export default {
   name: "HelloWorld",
@@ -93,7 +87,7 @@ export default {
       usage: [
         {
           name: "使用医院数",
-          link: require('@/assets/icon1.png')
+          link: require("@/assets/icon1.png")
         },
         {
           name: "使用设备数",
@@ -127,21 +121,23 @@ export default {
   },
   components: {
     DisplayCloud,
-    DisplayUsage,
+    DisplayUsage
   },
-
-  // methods: {
-  //   addUrl(name){
-  //       this.$route.push({path:'/log'});
-  //       console.log(name);
-  //   }
-  // }
+  mounted(){
+    //this.routerSelect();
+  },
+  methods: {
+    routerSelect(name) {
+      this.$router.push({path:name});
+    }
+  }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1,h2 {
+h1,
+h2 {
   font-weight: normal;
 }
 ul {
@@ -152,7 +148,9 @@ li {
   display: inline-block;
   margin: 0 10px;
 }
-
+.hello{
+  min-width: 1366px;
+}
 .layout {
   border: 1px solid #d7dde4;
   background: #f5f7f9;
@@ -172,11 +170,14 @@ li {
 }
 .layout-nav {
   width: 380px;
+  height: 70px;
   float: right;
 }
-.card{
-  margin: 15px;
-  width: 300px;
+.card {
+  margin: 15px 6px;
+  width: 230px;
+  height: 150px;
+  font-size: 16px;
 }
 
 .submenu {

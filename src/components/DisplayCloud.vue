@@ -4,7 +4,7 @@
     <template>
         <div>  
         <Tabs :animated="false">
-            <TabPane label="公有云" width="300px"></TabPane>
+            <TabPane label="公有云" width="33.33%"></TabPane>
             <TabPane label="私有云"></TabPane>
             <TabPane label="总计"></TabPane>
         </Tabs>
@@ -111,6 +111,11 @@
 </script>
 
 <style scoped>
+    #container{
+        background: white;
+        width: 90%;
+        min-width: 1000px;
+    }
     #location, #time {
         margin-left: 10px;
         text-align: left;
