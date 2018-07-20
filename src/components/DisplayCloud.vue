@@ -1,15 +1,13 @@
 <template>    
 <div>
     <div id="container">
-    <template>
-        <div>  
+        <!-- <div>   -->
         <Tabs :animated="false">
-            <TabPane label="公有云" width="33.33%"></TabPane>
-            <TabPane label="私有云"></TabPane>
-            <TabPane label="总计"></TabPane>
+            <div style="width: 100px;"><TabPane class="tab" label="公有云"></TabPane></div>
+            <TabPane class="tab" label="私有云"></TabPane>
+            <TabPane class="tab" label="总计"></TabPane>
         </Tabs>
-        </div>
-    </template>
+        <!-- </div> -->
 
     <template>
             <div id="location">
@@ -111,11 +109,14 @@
 </script>
 
 <style scoped>
+    .ivu-tabs-tab{
+        width: 33%;
+    }
     #container{
         background: white;
-        width: 90%;
+        width: 90.5%;
         min-width: 1000px;
-    }
+        }
     #location, #time {
         margin-left: 10px;
         text-align: left;

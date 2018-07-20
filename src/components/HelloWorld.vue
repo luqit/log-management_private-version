@@ -174,7 +174,7 @@ li {
   float: right;
 }
 .card {
-  margin: 15px 6px;
+  margin: 11px 6px;
   width: 230px;
   height: 150px;
   font-size: 16px;

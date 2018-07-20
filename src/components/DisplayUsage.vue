@@ -1,6 +1,6 @@
 <template>
     <Row :gutter="16">
-        <Col span="6"  v-for="( value , index) in usage" :key='index'>
+        <Col span="6"  v-for="( value , index) in usage" :key='index' style="padding: 0px 0px;">
             <Card class="usage">
                 <div>{{value.name}}</div>
                 <img :src='value.link'>
@@ -42,8 +42,11 @@ export default {
 </script>
 
 <style scoped>
-    .usage{
-    margin: 15px;
-    width: 300px;
-    }
+
+  .usage{
+    margin: 11px 6px;
+    width: 230px;
+    height: 150px;
+    font-size: 16px;
+  }
 </style>
