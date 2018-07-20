@@ -10,8 +10,12 @@ import 'iview/dist/styles/iview.css'
 Vue.use(VueRouter);
 Vue.use(IView);
 
-
 Vue.config.productionTip = false
+
+Vue.prototype.$goRoute = function (index) {
+  this.$router.push(index)
+  console.log(index)
+}
 
 /* eslint-disable no-new */
 new Vue({

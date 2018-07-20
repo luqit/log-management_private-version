@@ -3,7 +3,7 @@
     <template>
     <div class="layout">
         <Layout>
-            <Header>
+            <Header style="height: 70px;">
                 <Menu mode="horizontal" theme="dark" active-name="1">
                     <div class="layout-logo"><img src="@/assets/icon-iflytek.png"></div>
                     <div class="layout-nav">
@@ -19,18 +19,18 @@
                 </Menu>
             </Header>
             <Layout>
-                <Sider hide-trigger :style="{background: '#e3eff9'}">
+                <Sider hide-trigger :style="{background: '#e8f4fe'}">
                     <Menu active-name="1-2" theme="light" width="auto" style="height: 500px; width:300px; font-size: 16px;" :open-names="['1']">
                         <Submenu name="1">
                           <template slot="title">
                               <Icon type="ios-navigate"></Icon>
                               首页
                           </template>
-                          <MenuItem name="log" class="submenu"  @on-select="addUrl">使用总量统计</MenuItem>
+                          <MenuItem name="log" class="submenu"  @on-select="goRoute('/log')">使用总量统计</MenuItem>
                           <MenuItem name="1-2" class="submenu">医院使用统计</MenuItem>
                           <MenuItem name="1-3" class="submenu">科室使用统计</MenuItem>
                         </Submenu>
-                        <Submenu name="log" @on-select="addUrl">
+                        <Submenu name="log">
                           <template slot="title">
                               <Icon type="ios-keypad"></Icon>
                               日志管理
@@ -45,7 +45,7 @@
                     </Menu>
                 </Sider>
                 <Layout :style="{padding: '0 0'}">
-                    <Content :style="{padding: '24px 180px', minHeight: '1000px', background: '#e3eff9'}">
+                    <Content :style="{padding: '24px 180px', minHeight: '1000px', background: '#e8f4fe'}">
                       <template>
                         <Row :gutter="16">
                           <Col span="6"  v-for="( value , index) in usage" :key='index'>
@@ -82,6 +82,7 @@
 <script>
 import DisplayCloud from "./DisplayCloud.vue";
 import DisplayUsage from "./DisplayUsage.vue";
+
 
 export default {
   name: "HelloWorld",
@@ -129,12 +130,12 @@ export default {
     DisplayUsage,
   },
 
-  methods: {
-    addUrl(name){
-        this.$route.push({path:'/log'});
-        console.log(name);
-    }
-  }
+  // methods: {
+  //   addUrl(name){
+  //       this.$route.push({path:'/log'});
+  //       console.log(name);
+  //   }
+  // }
 };
 </script>
 
