@@ -19,28 +19,24 @@
             </Header>
             <Layout>
                 <Sider width="260px" hide-trigger :style="{background: '#e8f4fe', minWidth: '260px'}">
-                    <Menu active-name="1-2" theme="light" width="auto" style="height: 500px; width:260px; font-size: 16px;" :open-names="['1']">
+                    <Menu active-name="1-2" theme="light" width="auto" style="height: 500px; width:260px; font-size: 16px;" :open-names="['1']" @on-select="routerSelect">             
                         <Submenu name="1">
-                          <template slot="title">
+                          <template slot="title">  
                               <Icon type="ios-navigate"></Icon>
                               首页
                           </template>
-                          <MenuItem class="submenu" name="log" >使用总量统计</MenuItem>
+                          <MenuItem class="submenu" name="1-1" >使用总量统计</MenuItem>
                           <MenuItem name="1-2" class="submenu">医院使用统计</MenuItem>
                           <MenuItem name="1-3" class="submenu">科室使用统计</MenuItem>
                         </Submenu>
-                        <Submenu name="2">
-                          <template slot="title">
-                              <Icon type="ios-keypad"></Icon>
-                              日志管理
-                          </template>
-                        </Submenu>
-                        <Submenu name="3">
-                          <template slot="title">
-                              <Icon type="ios-analytics"></Icon>
-                              账号管理
-                          </template>
-                        </Submenu>
+                        <MenuItem name="log">
+                          <Icon type="settings"></Icon>
+                          日志管理
+                        </MenuItem>
+                        <MenuItem name="account">
+                          <Icon type="settings"></Icon>
+                          账号管理
+                        </MenuItem>
                     </Menu>
                 </Sider>
                 <Layout :style="{padding: '0 0'}">

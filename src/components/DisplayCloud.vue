@@ -1,15 +1,18 @@
 <template>    
-<div>
     <div id="container">
-        <!-- <div>   -->
-        <Tabs :animated="false">
-            <div style="width: 100px;"><TabPane class="tab" label="公有云"></TabPane></div>
-            <TabPane class="tab" label="私有云"></TabPane>
-            <TabPane class="tab" label="总计"></TabPane>
-        </Tabs>
-        <!-- </div> -->
-
-    <template>
+        <div id="tabpane">
+            <ul class="tabs">
+            <li v-for="(tab, index) in tabs" :key="index">
+            <div class="content" @click="selectTab(tab)" :class="{'is-active': tab.isSelected}">{{tab.name}}</div>
+            </li>
+            </ul>
+            <!-- <ul class="tabs" style="height: ;">
+            <li><div class="content">公有云</div></li>
+            <li><div class="content">私有云</div></li>
+            <li><div class="content">总计</div></li>
+            </ul> -->
+        </div>
+    <div>
             <div id="location">
                 <span>省份
                 <Select v-model="model2" size="large" style="width:100px" placeholder="">
@@ -42,13 +45,9 @@
                     <Button type="ghost">{{value.name}}</Button>
                 </ButtonGroup>
                 <Button type="ghost">搜索</Button>
-            </div>
-
-        
-    </template>
+            </div>          
+        </div>
     </div>
-
-</div>
 </template>
 
 <script>
@@ -103,23 +102,76 @@
                 //link: "/static/icon4.png"
                 }
                 ],
+
+                tabs: [
+                    {name: "公有云", isSelected: true,},
+                    {name: "私有云", isSelected: false,},
+                    {name: "总计", isSelected: false,},
+                    ],
+                // currentTab: "1",
             }
-        }    
+        }, 
+        computed: {
+            // currentTabComponent: function () {}
+        },
+
+        methods: {
+            addBorder(){
+                this.addClass(".clicked"); 
+            },
+            selectTab(selectedTab) {
+                this.tabs.forEach(tab => {
+                 tab.isSelected = (tab.name == selectedTab.name);
+                 console.log(tab.isSelected);
+            })
+            
+            }
+        }  
     }
 </script>
 
 <style scoped>
-    .ivu-tabs-tab{
-        width: 33%;
+    ul {list-style-type: none;}
+    ul, li { 
+        margin:0;
+        padding: 0;
+        text-align: center;
+    }
+
+    .tabs>li {
+        float: left;
+        width: 33.333333%
+    }
+    .tabs>li>.content {
+        height: 62px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ivu-tabs-ink-bar {
+        width: 150px;
+    }
+    .is-active {
+        border-bottom: 3px solid #248fff;
+    }
+    #tabpane {
+        /* display: box; */
+        width: 100%;   
+        height: 62px; 
+        border-bottom: 2px solid #e4e4e4;   
+        margin-bottom: 
     }
     #container{
         background: white;
-        width: 90.5%;
-        min-width: 1000px;
+        /* width: 90.6%; */
+        min-width: 1008px;
+        margin-right: 66px;
         }
     #location, #time {
         margin-left: 10px;
         text-align: left;
+        
     }
 
     #time {    
