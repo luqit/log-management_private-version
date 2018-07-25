@@ -29,7 +29,9 @@
       <DatePicker class="date-picker" type="date" placeholder="选择日期"></DatePicker>
       <div class="item-left">至</div>
       <DatePicker class="date-picker" type="date" placeholder="选择日期"></DatePicker>
+      <Input v-model="macValue" placeholder="输入MAC等" style="width: 100px; margin-left: 56px;"></Input>
     </div>
+    
   </div>
   </div>
 </template>
@@ -46,6 +48,36 @@ export default {
       {name: "私有云", isSelected: false,},
       {name: "总计", isSelected: false,},
       ],
+      cityList: [
+      {
+          value: 'New York',
+          label: 'New York'
+      },
+      {
+          value: 'London',
+          label: 'London'
+      },
+      {
+          value: 'Sydney',
+          label: 'Sydney'
+      },
+      {
+          value: 'Ottawa',
+          label: 'Ottawa'
+      },
+      {
+          value: 'Paris',
+          label: 'Paris'
+      },
+      {
+          value: 'Canberra',
+          label: 'Canberra'
+      }
+    ],
+      model2: '',
+      model3: '',
+      model4: '',
+      macValue: '',
     }
   },
   methods: {
@@ -109,7 +141,7 @@ export default {
       width: 100%;
       min-width: 1008px;
       margin-right: 66px;
-      height: 204px;
+      height: 160px;
   }
   #location, #time {
       margin-top: 10px;

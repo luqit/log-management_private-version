@@ -74,6 +74,6 @@ export default {
       width: 100%;
       min-width: 1008px;
       margin-right: 66px;
-      height: 204px;
+      height: 130px;
   }
 </style>
