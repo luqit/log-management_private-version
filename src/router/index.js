@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+import DisplayHome from '@/components/DisplayHome'
 import LogManagement from '@/components/LogManagement'
+import ActManagement from '@/components/ActManagement'
+
 
 Vue.use(Router)
 
@@ -9,13 +11,18 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
+      name: 'DisplayHome',
+      component: DisplayHome
     },
     {
       path: '/log',
       name: 'log',
       component: LogManagement
-      },
+    },
+    {
+      path: '/account',
+      name: 'ActManagement',
+      component: ActManagement
+    },
   ]
 })
