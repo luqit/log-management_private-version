@@ -14,15 +14,15 @@
         </div>
     <div>
             <div id="location">
-                <span>省份
+                <div class="item-left">省份</div>
                 <Select v-model="model2" size="large" style="width:100px" placeholder="">
                     <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                </Select></span>
-                <span>市区</span>
+                </Select>
+                <div class="item-left">市区</div>
                 <Select v-model="model3" size="large" style="width:100px" placeholder="">
                     <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                 </Select>
-                <span>单位</span>
+                <div class="item-left">单位</div>
                 <Select v-model="model4" size="large" style="width:100px" placeholder="">
                     <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                 </Select>
@@ -30,21 +30,23 @@
             </div>
 
             <div id="time">
-                <span>时间</span>
-                <DatePicker type="date" placeholder="选择日期" style="width: 100px"></DatePicker>
-                <span>至</span>
-                <DatePicker type="date" placeholder="选择日期" style="width: 100px"></DatePicker>
-                <Button type="ghost">今日</Button>
-                <Button type="ghost">昨日</Button>
-                <Button type="ghost">近一日</Button>
-                <Button type="ghost">近一周</Button>
-                <Button type="ghost">近一月</Button>
+                <div class="item-left" >时间</div>
+                <DatePicker class="date-picker" type="date" placeholder="选择日期"></DatePicker>
+                <div class="item-left">至</div>
+                <DatePicker class="date-picker" type="date" placeholder="选择日期"></DatePicker>
+                <div style="display: inline-block;">
+                    <Button type="ghost">今日</Button>
+                    <Button type="ghost">昨日</Button>
+                    <Button type="ghost">近一日</Button>
+                    <Button type="ghost">近一周</Button>
+                    <Button type="ghost">近一月</Button>
+                </div>
             </div>
             <div>
                 <ButtonGroup v-for="( value , index) in usage" :key='index'>
                     <Button type="ghost">{{value.name}}</Button>
                 </ButtonGroup>
-                <Button type="ghost">搜索</Button>
+                <Button type="ghost" style="margin-left: 10px;">搜索</Button>
             </div>          
         </div>
     </div>
@@ -155,6 +157,15 @@
     .is-active {
         border-bottom: 3px solid #248fff;
     }
+    .date-picker {
+        /* margin-left: 46px; */
+        width: 100px;
+    }
+    .item-left {
+        display: inline-block; 
+        width: 52px; 
+        text-align: right;
+    }
     #tabpane {
         /* display: box; */
         width: 100%;   
@@ -167,15 +178,15 @@
         /* width: 90.6%; */
         min-width: 1008px;
         margin-right: 66px;
+        height: 204px;
         }
     #location, #time {
-        margin-left: 10px;
-        text-align: left;
-        
+        margin-top: 10px;
+        text-align: left;    
     }
 
     #time {    
-        margin: 30px 10px;    
+        margin: 10px 0px;    
     }
 
 
