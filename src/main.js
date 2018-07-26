@@ -2,6 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import axios from 'axios'
 import App from './App'
 import router from './router'
 import IView from 'iview'
@@ -12,6 +13,7 @@ Vue.use(IView);
 
 Vue.config.productionTip = false
 
+Vue.prototype.$http = axios
 Vue.prototype.$goRoute = function (index) {
   this.$router.push(index)
   console.log(index)

@@ -22,6 +22,7 @@
         <Select v-model="model4" size="large" style="width:100px" placeholder="">
             <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
         </Select>
+        <Button type="primary" style="margin-left: 15px;">导入</Button>
         <br>
     </div>
     <div id="time">
@@ -30,6 +31,7 @@
       <div class="item-left">至</div>
       <DatePicker class="date-picker" type="date" placeholder="选择日期"></DatePicker>
       <Input v-model="macValue" placeholder="输入MAC等" style="width: 100px; margin-left: 56px;"></Input>
+      <Button type="primary" style="margin-left: 15px;">搜索</Button>
     </div>
     
   </div>

@@ -1,7 +1,5 @@
 <template>
   <div>
-      <!-- <Row :gutter="16" style="display: flex;"> -->
-        <!-- <div span="6" v-for="( value , index) in usage" :key='index' style="padding: 0px 0px;"> -->
       <div style="display: flex; justify-content: space-between;">
         <div class="card" v-for="( value, index) in usage" :key='index' style="padding: 0px 0px;">
           <div>{{value.name}}</div>
@@ -9,7 +7,6 @@
           <div class="display-num">{{value.num}}</div>
         </div>
       </div>
-      <!-- </Row> -->
       <div style="display: flex; justify-content: space-between;">
         <div class="card" v-for="( value, index) in totalInput" :key='index' style="padding: 0px 0px;">
           <div>{{value.name}}</div>
@@ -94,17 +91,17 @@ export default {
       },
       {
         name: "使用设备数",
-        link: "/static/icon2.png",
+        link: require("@/assets/icon2.png"),
         num: 7820,
       },
       {
         name: "使用用户数",
-        link: "/static/icon3.png",
+        link: require("@/assets/icon3.png"),
         num: 15220,
       },
       {
         name: "使用科室数",
-        link: "/static/icon4.png",
+        link: require("@/assets/icon4.png"),
         num: 320,
       }
     ],
@@ -112,17 +109,17 @@ export default {
     totalInput: [
       {
         name: "累计输入字数",
-        link: "/static/icon5.png",
+        link:require("@/assets/icon5.png"),
         num: 3535,
       },
       {
-        name: "累计调用字数",
-        link: "/static/icon6.png",
-        num: 15220,
+        name: "累计调用次数",
+        link: require("@/assets/icon6.png"),
+        num: null,
       },
       {
         name: "累计录音时间",
-        link: "/static/icon7.png",
+        link: require("@/assets/icon7.png"),
         num: 320,
       }
     ],
@@ -157,7 +154,7 @@ export default {
       {name: "私有云", isSelected: false,},
       {name: "总计", isSelected: false,},
       ],
-    model2: '',
+    model2: null,
     model3: '',
     model4: '',
   }
@@ -170,23 +167,48 @@ export default {
         this.tabs.forEach(tab => {
           tab.isSelected = (tab.name == selectedTab.name);
           console.log(tab.isSelected);
-    })
-    
+    })    
+    },
+
+    requestNum(){
+      this.$http.get('/api/flylog-search-web/api/timeline.do', {
+      params: {
+        startTime: '2018-07-01 00:00:00',
+        endTime: '2018-07-26 00:00:00',
+        platform: 'siat'
+      }
+      })
+      .then((response) => {
+        var nums = 0;
+        var lognums = response.data.logCount;
+        lognums.forEach(value => nums += value);
+        this.totalInput[1].num = nums;
+        console.log(this.totalInput[1].num);
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+      .then(function () {
+        // always executed
+      });  
     }
-  }  
+  },
+  
+  mounted() {
+    this.requestNum();
+  }
+  
 }
 </script>
 
 <style scoped>
   .card {
-    margin: 11px 0;
+    margin-top: 14px;
     width: 230px;
     height: 150px;
     font-size: 14px;
     color: #828282;
     background-color: white;
-    /* -moz-box-shadow:0 0 10px rgb(238, 238, 238);
-    -webkit-box-shadow:0 0 10px #5f5f5f; */
     box-shadow:0 0 10px #dfdfdf;  
     display: flex;
     flex-direction: column;
@@ -222,7 +244,6 @@ export default {
       border-bottom: 3px solid #248fff;
   }
   .date-picker {
-      /* margin-left: 46px; */
       width: 100px;
   }
   .item-left {
@@ -244,6 +265,7 @@ export default {
       width: 100%;
       min-width: 1008px;
       margin-right: 66px;
+      margin-top: 2px;
       height: 204px;
       }
   #location, #time {
