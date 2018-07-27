@@ -44,19 +44,16 @@ li {
 .layout {
   border: 1px solid #d7dde4;
   background: #f5f7f9;
-  /* position: relative; */
   border-radius: 4px;
   overflow: hidden;
 }
 .layout-logo {
   width: 200px;
   height: 40px;
-  /* background: #5b6270; */
   border-radius: 3px;
   float: left;
   position: relative;
   top: 11px;
-  /* left: 20px; */
 }
 .layout-nav {
   width: 380px;
