@@ -105,17 +105,21 @@
           <div class="display-num">{{value.searchNum}}</div>
         </div>
       </div>
-      <ChartDisplayInput></ChartDisplayInput> 
+      <div class="canvas-for-chart" id="chart1"><ChartDisplayInput></ChartDisplayInput></div>
+      <!-- <div class="canvas-for-chart" id="chart2"><ChartDisplayRank></ChartDisplayRank></div> -->
   </div> 
 </template>
 
 <script>
 import ChartDisplayInput from './ChartDisplayInput.vue'
+import ChartDisplayRank from './ChartDisplayRank.vue'
+
 
 export default {
   name: 'DisplayHome',
   components: {
     ChartDisplayInput,
+    ChartDisplayRank,
   },
   data() {
   return {
@@ -336,6 +340,7 @@ export default {
   mounted() {
     this.requestNum();
     this.requestUserNum();
+    
   }
   
 }
@@ -390,6 +395,9 @@ export default {
       display: inline-block; 
       width: 52px; 
       text-align: right;
+  }
+  .canvas-for-chart{
+    height:352px;
   }
   #tabpane {
       /* display: box; */
