@@ -81,11 +81,6 @@
               :value="endTime">
             </DatePicker>
             <div style="display: inline-block; margin-left: 56px;">
-                <!-- <Button type="ghost">今日</Button>
-                <Button type="ghost">昨日</Button>
-                <Button type="ghost">近一日</Button>
-                <Button type="ghost">近一周</Button>
-                <Button type="ghost">近一月</Button> -->
                 <Button 
                   type="ghost" 
                   v-for="(value, index) in btnList"
@@ -99,7 +94,7 @@
             <ButtonGroup v-for="( value , index) in usage" :key='index'>
                 <Button type="ghost">{{value.name}}</Button>
             </ButtonGroup>
-            <Button type="primary" style="margin-left: 10px;">搜索</Button>
+            <Button type="primary" style="margin-left: 10px;" @click="searchDisplay()">搜索</Button>
         </div>          
         </div>
     </div>
@@ -107,16 +102,21 @@
         <div class="card" v-for="( value, index) in usage" :key='index' style="padding: 0px 0px;">
           <div>{{value.name}}</div>
           <div><img :src='value.link'></div>
-          <div class="display-num">{{value.num}}</div>
+          <div class="display-num">{{value.searchNum}}</div>
         </div>
       </div>
+      <ChartDisplayInput></ChartDisplayInput> 
   </div> 
 </template>
 
 <script>
+import ChartDisplayInput from './ChartDisplayInput.vue'
 
 export default {
   name: 'DisplayHome',
+  components: {
+    ChartDisplayInput,
+  },
   data() {
   return {
     msg: "Welcome",
@@ -128,6 +128,7 @@ export default {
         privateNum: 1,
         publicNum: 1,
         totalNum: null,
+        searchNum: 0,
       },
       {
         name: "使用设备数",
@@ -135,6 +136,7 @@ export default {
         privateNum: 7820,
         publicNum: 1,
         totalNum: null,
+        searchNum: 0,
       },
       {
         name: "使用用户数",
@@ -142,6 +144,7 @@ export default {
         privateNum: 15220,
         publicNum: 1,
         totalNum: null,
+        searchNum: 0,
       },
       {
         name: "使用科室数",
@@ -149,6 +152,7 @@ export default {
         privateNum: 320,
         publicNum: 1,
         totalNum: null,
+        searchNum: 0,
       }
     ],
 
@@ -189,9 +193,9 @@ export default {
     btnList: [
       {name: "今日", methods: "clickShortcut1"},
       {name: "昨日", methods: "clickShortcut2"},
-      {name: "近一周", methods: "clickShortcut3()"},
-      {name: "近一月", methods: "clickShortcut4()"},
-      {name: "近一年", methods: "clickShortcut5()"},
+      {name: "近一周", methods: "clickShortcut3"},
+      {name: "近一月", methods: "clickShortcut4"},
+      {name: "近一年", methods: "clickShortcut5"},
     ],
 
     seletedProvince: ' ',
@@ -213,6 +217,10 @@ export default {
     })    
     },
 
+    computeTimeSlot(){
+
+    },
+   
     requestNum(){
       this.$http.get('/api/flylog-search-web/api/timeline.do', {
       params: {
@@ -226,6 +234,7 @@ export default {
         var lognums = response.data.logCount;
         lognums.forEach(value => nums += value);
         this.totalInput[1].privateNum = nums;
+        console.log(response);
         console.log(this.totalInput[1].privateNum);
       })
       .catch(function (error) {
@@ -236,7 +245,7 @@ export default {
       });  
     },
 
-     requestUserNum(){
+    requestUserNum(){
       this.$http.get('/api/flylog-search-web/api/getLogStat.do', {
       params: {
         startTime: '2018-07-26 00:00:00',
@@ -254,6 +263,29 @@ export default {
       .then(function () {
         // always executed
       });  
+    },
+
+    searchDisplay(){
+      this.$http.get('/api/flylog-search-web/api/timeline.do', {
+      params: {
+        startTime: "2018-07-07 00:00:00",
+        endTime: "2018-07-28 00:00:00",
+        platform: 'siat',
+      }
+      })
+      .then((response) => {
+        var nums = 0;
+        var lognums = response.data.logCount;
+        lognums.forEach(value => nums += value);
+        this.usage[2].searchNum = nums;
+        console.log(this.usage[1].searchNum);
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+      .then(function () {
+        // always executed
+      });        
     },
 
     clickShortcut(index){
@@ -278,10 +310,10 @@ export default {
           endDate1.setSeconds(0);
           endDate1.setMilliseconds(0);
           startDate1.setTime(endDate1.getTime() - 3600 * 1000 * 24);
-          this.startTime = startDate1;
-          this.endTime = endDate1;
-          console.log(startDate1);
-          console.log(endDate1);
+          this.startTime = startDate1.format();
+          this.endTime = endDate1.format();
+          console.log(this.startTime);
+          console.log(this.endTime);
           break;
         case(2):
           var startDate2 = new Date();
@@ -298,7 +330,6 @@ export default {
           break;
       }
     },
-
 
   },
   
