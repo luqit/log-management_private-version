@@ -1,7 +1,7 @@
 <!--account management page -->
 <template>
     <div id="container">
-        <div style="margin-top: 14px;">
+        <div style="margin: 14px 0; height: 130px; background: white;">
             <div id="tabpane">
                 <ul class="tabs">
                     <li v-for="(tab, index) in tabs" :key="index">
@@ -9,17 +9,26 @@
                     </li>
                 </ul>    
             </div>
+
+            <!-- The content of the submitted form will be binded to the variable 'logName' and 'userStatus'' -->
             <div style="margin-top: 17px;">
                 <div class="item-left">登录名称</div>
                 <Input v-model="logName" placeholder="请输入登录名" style="width:120px;"></Input>
                 <div class="item-left">用户状态</div>
-                <Select v-model="model1" style="width:110px">
-                    <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                <Select v-model="userStatus" style="width:110px">
+                    <Option v-for="item in statusList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                 </Select>
                 <Button class="item-left" type="primary">搜索</Button>
             </div>
         </div>
 
+        <div id="button-group">
+            <Button type="primary" class="button-handle-data">新建</Button>
+            <Button type="success" class="button-handle-data">停用</Button>
+            <Button type="error" class="button-handle-data">启用</Button>
+        </div>
+
+        <!-- Display the searching results in the table -->
         <div id="table">
             <Table :columns="columns" :data="accountData" size="large"></Table>
             <Page :total="dataCount" show-elevator show-total :page-size="pageSize"  @on-change="changepage" class="paging"/>
@@ -79,25 +88,29 @@ export default {
         },
         ],
 
-        logName: '',
-        datacount: 0,
-        pageSize: 5,
-        ajaxData: [],
+        statusList:[],
+
+        logName: '', //登录名
+        userStatus: '', //用户状态
+        datacount: 0, // 搜索结果的数量
+        pageSize: 5, // 表格每页显示的数据条数
+        ajaxData: [], //搜索结果
     }
   },
+
+
   methods: {
-    
-    addBorder(){
-        this.addClass(".clicked"); 
-    },
+
     selectTab(selectedTab) {
         this.tabs.forEach(tab => {
           tab.isSelected = (tab.name == selectedTab.name);
           console.log(tab.isSelected);
-    })
-    
-    }    
-  }
+        })
+    },
+
+  },
+
+
 }
 </script>
 
@@ -136,11 +149,16 @@ export default {
         float: right;
         margin-top:10px;
     }
-    #table {
-        margin-top: 32px;
+    .button-handle-data{
+        margin: auto 5px;
+    }
+    #container{
+        width: 100%;
+        min-width: 1008px;
+        margin-right: 66px;
+        text-align: left;
     }
     #tabpane {
-        /* display: box; */
         width: 100%;   
         height: 62px; 
         border-bottom: 2px solid #e4e4e4; 
@@ -148,12 +166,14 @@ export default {
         font-weight: bold;
         color: #666666;        
     }
-    #container{
-        background: white;
+    #button-group {
+        height: 40px; 
         width: 100%;
-        min-width: 1008px;
-        margin-right: 66px;
-        height: 130px;
-        text-align: left;
+        display: flex; 
+        align-items: center; 
+        justify-content: flex-end;
+        background: white;
+        padding-right: 20px;
+        box-shadow:0 0 10px #dfdfdf;
     }
 </style>
