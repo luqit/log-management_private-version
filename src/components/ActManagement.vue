@@ -1,38 +1,92 @@
+<!--account management page -->
 <template>
-  <div id="container">
-      <div id="tabpane">
-        <ul class="tabs">
-        <li v-for="(tab, index) in tabs" :key="index">
-        <div class="content" @click="selectTab(tab)" :class="{'is-active': tab.isSelected}">{{tab.name}}</div>
-        </li>
-        </ul>    
-      </div>
-      <div style="margin-top: 15px;">
-        <div class="item-left">登录名称</div>
-        <Input v-model="logName" placeholder="请输入登录名" style="width:120px;"></Input>
-        <div class="item-left">用户状态</div>
-        <Select v-model="model1" style="width:110px">
-            <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-        </Select>
-        <Button class="item-left" type="primary">搜索</Button>
-      </div>
+    <div id="container">
+        <div style="margin-top: 14px;">
+            <div id="tabpane">
+                <ul class="tabs">
+                    <li v-for="(tab, index) in tabs" :key="index">
+                    <div class="content" @click="selectTab(tab)" :class="{'is-active': tab.isSelected}">{{tab.name}}</div>
+                    </li>
+                </ul>    
+            </div>
+            <div style="margin-top: 17px;">
+                <div class="item-left">登录名称</div>
+                <Input v-model="logName" placeholder="请输入登录名" style="width:120px;"></Input>
+                <div class="item-left">用户状态</div>
+                <Select v-model="model1" style="width:110px">
+                    <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                </Select>
+                <Button class="item-left" type="primary">搜索</Button>
+            </div>
+        </div>
+
+        <div id="table">
+            <Table :columns="columns" :data="accountData" size="large"></Table>
+            <Page :total="dataCount" show-elevator show-total :page-size="pageSize"  @on-change="changepage" class="paging"/>
+        </div>  
     </div>
 </template>
 
 <script>
 export default {
-  name: 'ActManagment',
-  data(){
+    name: 'ActManagment',
+    data(){
     return{
-      tabs: [
-      {name: "公有云", isSelected: true,},
-      {name: "私有云", isSelected: false,},
-      {name: "总计", isSelected: false,},
-      ],
-      logName: '',
+        tabs: [
+        {
+            name: "公有云", 
+            isSelected: true,
+        },
+        {
+            name: "私有云", 
+            isSelected: false,
+        },
+        {
+            name: "总计", 
+            isSelected: false,
+        },
+        ],
+
+        columns: [
+        {
+            title: '序号',
+            key: 'nums',
+            width: 100,
+        },
+        {
+            title: '登陆名称',
+            key: 'username'
+        },
+        {
+            title: '所属医院',
+            key: 'hospital'
+        },
+        {
+            title: '所在科室',
+            key: 'section'
+        },
+        {
+            title: '用户来源',
+            key: 'resource', 
+        },
+        {
+            title: '用户状态',
+            key: 'status', 
+        },
+         {
+            title: '操作',
+            key: 'operation', 
+        },
+        ],
+
+        logName: '',
+        datacount: 0,
+        pageSize: 5,
+        ajaxData: [],
     }
   },
   methods: {
+    
     addBorder(){
         this.addClass(".clicked"); 
     },
@@ -77,6 +131,13 @@ export default {
         width: 52px; 
         margin-left: 15px;
         text-align: right;
+    }
+    .paging{
+        float: right;
+        margin-top:10px;
+    }
+    #table {
+        margin-top: 32px;
     }
     #tabpane {
         /* display: box; */

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="container">
-        <div id="tabpane">
+        <div id="tabpane" style="margin-top: 14px;">
           <ul class="tabs">
           <li v-for="(tab, index) in tabs" :key="index">
           <div class="content" @click="selectTab(tab)" :class="{'is-active': tab.isSelected}">{{tab.name}}</div>
@@ -32,6 +32,11 @@
       <DatePicker class="date-picker" type="date" placeholder="选择日期"></DatePicker>
       <Input v-model="macValue" placeholder="输入MAC等" style="width: 100px; margin-left: 56px;"></Input>
       <Button type="primary" style="margin-left: 15px;">搜索</Button>
+    </div>
+
+    <div id="table">
+        <Table :columns="columns1" :data="tableData" size="large"></Table>
+        <Page :total="dataCount" show-elevator show-total :page-size="pageSize"  @on-change="changepage" class="paging"/>
     </div>
     
   </div>
@@ -79,8 +84,92 @@ export default {
       model3: '',
       model4: '',
       macValue: '',
+
+    columns1: [
+    {
+        type: 'selection',
+        width: 60,
+        align: 'center'
+    },
+    {
+        title: '序号',
+        key: 'nums',
+        width: 100,
+    },
+    {
+        title: '医院',
+        key: 'hospital'
+    },
+    {
+        title: '科室',
+        key: 'section'
+    },
+    {
+        title: 'MAC地址',
+        key: 'address'
+    },
+    {
+        title: '时间',
+        key: 'date', 
+    },
+    {
+        title: '转录内容',
+        key: 'content',
     }
+    ],
+    tableData: [
+    {
+        hospital: 'John Brown',
+        section: 18,
+        address: 'New York No. 1 Lake Park',
+        date: '2016-10-03'
+    },
+    {
+        hospital: 'Jim Green',
+        section: 24,
+        address: 'London No. 1 Lake Park',
+        date: '2016-10-01'
+    },
+    {
+        hospital: 'Joe Black',
+        section: 30,
+        address: 'Sydney No. 1 Lake Park',
+        date: '2016-10-02'
+    },
+    {
+        hospital: 'Jon Snow',
+        section: 26,
+        address: 'Ottawa No. 2 Lake Park',
+        date: '2016-10-04'
+    },
+    {
+        hospital: 'Jon',
+        section: 26,
+        address: 'Ottawa No. 2 Lake Park',
+        date: '2016-10-04'
+    },
+    {
+        hospital: 'JSnow',
+        section: 26,
+        address: 'Ottawa No. 2 Lake Park',
+        date: '2016-10-04'
+    },
+    {
+        hospital: 'Snow',
+        section: 26,
+        address: 'Ottawa No. 2 Lake Park',
+        date: '2016-10-04'
+    },
+    ],
+    
+    datacount: 0,
+    pageSize: 5,
+    ajaxData: [],
+    
+    }
+    
   },
+
   methods: {
     addBorder(){
         this.addClass(".clicked"); 
@@ -89,10 +178,32 @@ export default {
         this.tabs.forEach(tab => {
           tab.isSelected = (tab.name == selectedTab.name);
           console.log(tab.isSelected);
-    })
+    })   
+    },
+
+    handleListApproveHistory(){
     
-    }    
-  }
+        // 保存取到的所有数据
+        this.ajaxData = this.tableData
+        this.dataCount = this.tableData.length;
+        // 初始化显示，小于每页显示条数，全显，大于每页显示条数，取前每页条数显示
+        if(this.tableData.length < this.pageSize){
+            this.tableData = this.ajaxData;
+        }else{
+            this.tableData = this.ajaxData.slice(0,this.pageSize);
+        }
+    },
+        changepage(index){
+            var _start = ( index - 1 ) * this.pageSize;
+            var _end = index * this.pageSize;
+            this.tableData = this.ajaxData.slice(_start,_end);
+        }
+    },
+    
+    created(){
+            this.handleListApproveHistory();
+    },
+
 }
 </script>
 
@@ -102,7 +213,10 @@ export default {
     margin:0;
     padding: 0;
     text-align: center;
-}
+    }
+    .ivu-table td{
+        height: 60px;
+    }
   .tabs>li {
     float: left;
     width: 33.333333%;
@@ -128,6 +242,11 @@ export default {
       width: 52px; 
       text-align: right;
   }
+  .paging{
+      float: right;
+      margin-top:10px;
+  }
+    
   #tabpane {
     /* display: box; */
     width: 100%;   
@@ -150,6 +269,8 @@ export default {
   }
 
   #time {    
-      margin: 10px 0px;    
+      margin: 10px 0px;   
+      margin-bottom: 22px; 
   }
+
 </style>

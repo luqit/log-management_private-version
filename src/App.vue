@@ -141,9 +141,11 @@ li {
   color: #95a0aa;
   box-shadow:1px 1px 0px #e8effc;
 }
-/* .submenu {
-  font-size: 16px;
-} */
+.ivu-table-large th{
+  height: 54px;
+  background-color: #fafcff;
+}
+
 #menu{
   height: 408px; 
   width:260px; 
