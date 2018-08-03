@@ -17,7 +17,15 @@ module.exports = {
       pathRewrite: { 
         '^/api': 'http://172.31.197.24:8080' //路径重写 
       } 
+    },
+    '/new': {   
+      target: 'http://172.16.17.43:8080', //源地址 
+      changeOrigin: true, //改变源 
+      pathRewrite: { 
+        '^/new': 'http://172.16.17.43:8080' //路径重写 
+      } 
     } 
+
     },
 
     // Various Dev Server settings

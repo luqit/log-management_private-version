@@ -55,7 +55,7 @@
 				</ul>    
 			</div>
 
-			<div id="location">
+			<div id="location" v-if="tabs[0].isSelected">
 				<div class="item-left">省份</div>
 				<Select v-model="seletedProvince" size="large" style="width:100px" placeholder="">
 					<Option v-for="item in provinceList" :value="item" :key="item">{{ item }}</Option>
@@ -96,14 +96,20 @@
 						@click="clickShortcut(index)">
 						{{value.name}}
 					</Button>
+					<Button type="primary" style="margin-left: 10px;" @click="searchDisplay()">搜索</Button>
 				</div>
         	</div>
 		
 			<div>
-				<ButtonGroup v-for="( value , index) in usage" :key='index'>
-					<Button type="ghost">{{value.name}}</Button>
-				</ButtonGroup>
-				<Button type="primary" style="margin-left: 10px;" @click="searchDisplay()">搜索</Button>
+				<ButtonGroup>
+					<Button 
+						v-for="( value , index) in chartClass" 
+						:key='index' 
+						type="ghost" 
+						@click="selectChart(value)">
+						{{value.name}}
+					</Button>
+				</ButtonGroup>	
 			</div>          
    	 	</div>
 
@@ -114,23 +120,34 @@
 			<div class="display-num">{{value.searchNum}}</div>
 			</div>
 		</div>
-
+		
+		<!-- Display three chasrts each time, use to pass parameters -->
       	<div class="canvas-for-chart" id="chart1">
-			<ChartDisplayInput></ChartDisplayInput>
+			<ChartDisplayUser v-if="chartClass[0].isSelected" :startdate="startTime.toString()" :enddate="endTime.toString()"></ChartDisplayUser>
+			<ChartDisplayInput v-if="chartClass[1].isSelected" :startdate="startTime" :enddate="endTime"></ChartDisplayInput>
+			<ChartDisplayWord v-if="chartClass[2].isSelected" :startdate="startTime" :enddate="endTime"></ChartDisplayWord>
+			<ChartDisplayTime v-if="chartClass[3].isSelected" :startdate="startTime" :enddate="endTime"></ChartDisplayTime>
 		</div>
      
   	</div> 
 </template>
 
 <script>
+var moment = require('moment');
+
+import ChartDisplayUser from './ChartDisplayUser.vue'
 import ChartDisplayInput from './ChartDisplayInput.vue'
-// import ChartDisplayRank from './ChartDisplayRank.vue'
+import ChartDisplayWord from './ChartDisplayWord.vue'
+import ChartDisplayTime from './ChartDisplayTime.vue'
 
 export default {
 	name: 'DisplayHome',
+
 	components: {
+		ChartDisplayUser,
 		ChartDisplayInput,
-		// ChartDisplayRank,
+		ChartDisplayWord,
+		ChartDisplayTime,
 	},
 	data() {
 	return {
@@ -236,12 +253,33 @@ export default {
 			methods: "clickShortcut5"},
 		],
 
+		chartClass: [
+		{
+			name: "使用用户数",
+			isSelected: true,
+		},
+		{
+			name: "累计输入字数",
+			isSelected: false,
+		},
+		{
+			name: "累计调用次数",
+			isSelected: false,
+		},
+		{
+			name: "累计录音时间",
+			isSelected: false,
+		}
+		],
+
+		category: ' ',
+		chartdata: ' ',
 		seletedProvince: ' ',
 		selectedCity: ' ',
 		selectedHospital: ' ',
 
-		startTime: null,
-		endTime: null,
+		startTime: "2018-07-01 00:00:00",
+		endTime: "2018-07-31 00:00:00",
   	}
 },
 
@@ -252,10 +290,12 @@ export default {
 			tab.isSelected = (tab.name == selectedTab.name);})    
 		},
 
-		computeTimeSlot(){
-
+		selectChart(selectedChart) {
+			this.chartClass.forEach(chart => {
+			chart.isSelected = (chart.name === selectedChart.name);})   
+			console.log(this.chartClass); 
 		},
-   
+
     	requestNum(){
 			this.$http.get('/api/flylog-search-web/api/timeline.do', {
 			params: {
@@ -269,8 +309,6 @@ export default {
 				var lognums = response.data.logCount;
 				lognums.forEach(value => nums += value);
 				this.totalInput[1].privateNum = nums;
-				console.log(response);
-				console.log(this.totalInput[1].privateNum);
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -303,8 +341,8 @@ export default {
 		searchDisplay(){
 			this.$http.get('/api/flylog-search-web/api/timeline.do', {
 			params: {
-				startTime: "2018-07-07 00:00:00",
-				endTime: "2018-07-28 00:00:00",
+				startTime:  moment(this.startTime).format("YYYY-MM-DD HH:mm:ss"),
+				endTime: moment(this.endTime).format("YYYY-MM-DD HH:mm:ss"),
 				platform: 'siat',
 			}
 			})
@@ -313,7 +351,7 @@ export default {
 				var lognums = response.data.logCount;
 				lognums.forEach(value => nums += value);
 				this.usage[2].searchNum = nums;
-				console.log(this.usage[1].searchNum);
+				// console.log(this.usage[1].searchNum);
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -323,45 +361,36 @@ export default {
 			});        
 		},
 
+		computeTimeSlot(preDays){
+			let now = new Date();
+			let now2 = new Date();
+			now.toString();
+			now2.toString();
+			let startDate = moment(now).startOf('day').subtract(preDays, 'days').format("YYYY-MM-DD HH:mm:ss");
+			let endDate = moment(now2).format("YYYY-MM-DD HH:mm:ss");
+			this.startTime = startDate.toString();
+			this.endTime = endDate.toString();
+			console.log(this.startTime);
+			console.log(this.endTime);
+		},  
+
 		clickShortcut(index){
 			switch(index){
 				case(0):
-					const startDate0 = new Date();
-					var endDate0 = new Date();
-					startDate0.setHours(0);
-					startDate0.setMinutes(0);
-					startDate0.setSeconds(0);
-					startDate0.setMilliseconds(0);
-					this.startTime = startDate0;
-					this.endTime = endDate0;
-					console.log(this.startTime);
-					console.log(this.endTime);
+					this.computeTimeSlot(0);
 					break;
 				case(1):
-					var startDate1 = new Date();
-					var endDate1 = new Date();
-					endDate1.setHours(0);
-					endDate1.setMinutes(0);
-					endDate1.setSeconds(0);
-					endDate1.setMilliseconds(0);
-					startDate1.setTime(endDate1.getTime() - 3600 * 1000 * 24);
-					this.startTime = startDate1.format();
-					this.endTime = endDate1.format();
-					console.log(this.startTime);
-					console.log(this.endTime);
+					this.computeTimeSlot(1);
+					this.endTime = moment(this.endTime).startOf('day').format("YYYY-MM-DD HH:mm:ss");
 					break;
 				case(2):
-					var startDate2 = new Date();
-					var endDate2 = new Date();
-					startDate2.setHours(0);
-					startDate2.setMinutes(0);
-					startDate2.setSeconds(0);
-					startDate2.setMilliseconds(0);
-					startDate2.setTime(startDate2.getTime() - 7 * 3600 * 1000 * 24);
-					this.startTime = startDate2;
-					this.endTime = endDate2;
-					console.log(startDate2);
-					console.log(endDate2);
+					this.computeTimeSlot(7);
+					break;
+				case(3):
+					this.computeTimeSlot(30);
+					break;
+				case(4):
+					this.computeTimeSlot(365);
 					break;
 			}
     	},
@@ -369,7 +398,7 @@ export default {
   
 	mounted() {
 		this.requestNum();
-		this.requestUserNum();	
+		// this.requestUserNum();	
 	} 
 }
 </script>

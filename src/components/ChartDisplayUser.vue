@@ -1,7 +1,7 @@
 <template>
     <div id="container">
         <div class="chart-header">
-            <div class="chart-title">使用用户数统计</div>
+            <div class="chart-title">用户数总量统计</div>
             <div style="float: right;">
                 <Button type="primary">刷新</Button>
                 <Button>列表详情</Button>
@@ -10,31 +10,93 @@
         <div id="myChart" :style="{width: '100%', height: '300px'}"></div>
 
         <div class="chart-header">
-            <div class="chart-title">输入字数总量统计</div>
+            <div class="chart-title">医院用户数排名</div>
             <div style="float: right;">
                 <Button type="primary">刷新</Button>
                 <Button>列表详情</Button>
             </div>
         </div>
         <div id="rankChart" :style="{width: '100%', height: '300px'}"></div>
+
+        
+        <div class="chart-header">
+            <div class="chart-title">科室用户数排名</div>
+            <div style="float: right;">
+                <Button type="primary">刷新</Button>
+                <Button>列表详情</Button>
+            </div>
+        </div>
+        <div id="rankChart2" :style="{width: '100%', height: '300px'}"></div>
     </div>
 </template>
 
 <script>
+    var moment = require('moment');
+
     export default {
         name: 'chart',
-
+        props: {
+            startdate: {
+                type: String,
+                default: function(){
+                    return ''
+                }
+            },
+            enddate: {
+                type: String,
+                default: function(){
+                    return ''
+                }
+            },          
+        },
         data () {
             return {
                 chart1: {},
                 chart2: {},
+                chart3: {},
+                // XData: ["05-16","05-17","05-18","05-19","05-20","05-21"],
+                XData: [1,2,3,4,5,6],
             }
         },
 
         methods: {
+
+            getXData(){
+                this.$http.get('/api/flylog-search-web/api/getLogs.do', {
+                params: {
+                    startTime: moment(this.startdate).format("YYYY-MM-DD HH:mm:ss"),
+                    endTime: moment(this.enddate).format("YYYY-MM-DD HH:mm:ss"),
+                    platform: 'siat',
+                }
+                })
+                .then((response) => {    
+                    this.XData = ["05-16","05-17","05-18","05-19","05-20","05-21"];
+                    let echarts = this.drawCharts()
+                    this.chart1 = echarts.myChart
+                    this.chart2 = echarts.rankChart
+                    this.chart3 = echarts.rankChart2
+                    window.onresize = () => {
+                        this.chart1.resize()
+                        this.chart2.resize()
+                        this.chart3.resize()
+
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                })
+                .then(function () {
+                    // always executed
+                });  
+            },
+
+            getYData(){},
+
             drawCharts(){
                 let myChart = this.$echarts.init(document.getElementById('myChart'))
                 let rankChart = this.$echarts.init(document.getElementById('rankChart'))
+                let rankChart2 = this.$echarts.init(document.getElementById('rankChart2'))
+
                 myChart.setOption({
                     grid:{
                         x:70,
@@ -54,8 +116,10 @@
                                 color:'#979797'
                             }
                         },
-                        data: ["05-16","05-17","05-18","05-19","05-20","05-21"]
+                        // data: ["05-16","05-17","05-18","05-19","05-20","05-21"]
+                        data: this.XData
                     },
+
                     yAxis: {
                         axisLine:{
                             lineStyle:{
@@ -87,7 +151,7 @@
                             {type: 'min', name: '最小值'}
                         ]
                         },
-                    }]
+                    }],
                 });
             
                 rankChart.setOption({
@@ -133,19 +197,69 @@
                         data: [5, 20, 36, 10, 10, 20, 16],
                     }]
                 });
-                return { myChart: myChart, rankChart: rankChart }
+
+                rankChart2.setOption({
+                    grid:{
+                        x:70,
+                        y:50,
+                        x2:70,
+                        y2:50,
+                        borderWidth:1
+                    },
+                    backgroundColor: 'white',
+                    legend: {
+                        right: '5%',
+                    },
+                    tooltip: {},
+                    xAxis: {
+                        axisLine:{
+                            lineStyle:{
+                                color:'#979797'
+                            }
+                        },
+                        data: ["05-16","05-17","05-18","05-19","05-20","05-21","05-22"]
+                    },
+                    yAxis: {
+                        axisLine:{
+                            lineStyle:{
+                                color:'#979797'
+                            }
+                        },
+                    },
+                    series: [{
+                        name: this.name,
+                        type: 'bar',
+                        color: "#52baf8",   
+                        barWidth: '40%',            
+                        itemStyle:{
+                            normal:{
+                                lineStyle:{
+                                    width:3,
+                                }
+                            }
+                        },
+                        data: [5, 20, 36, 10, 10, 20, 16],
+                    }]
+                });
+
+                return { myChart: myChart, rankChart: rankChart, rankChart2: rankChart2}
             }   
         },
 
-        mounted () {
-            let echarts = this.drawCharts()
-            this.chart1 = echarts.myChart
-            this.chart2 = echarts.rankChart
-            window.onresize = () => {
-                this.chart1.resize()
-                this.chart2.resize()
-            }
-        },
+
+        // created () {
+        //     // make charts adaptive to the window size
+        //     this.getXData();
+        //     console.log("create" + this.XData)
+    
+        // },
+
+        created(){
+            // console.log("2222");
+            this.getXData();
+            // console.log("mount" + this.XData)
+    
+        }
 
     }
 </script>
@@ -156,6 +270,7 @@
         border-bottom: 1px solid #e8e8e8; 
         height: 52px; 
         padding: 10px 50px;
+        margin-top: 14px;
     }
     .chart-title {
         /* display: inline-block;  */
@@ -173,10 +288,8 @@
     }
     #myChart {
        width: 100%;
-       margin-bottom: 14px;
     }
     #rankChart {
        width: 100%;
-       /* margin-top: 35px; */
     }
 </style>

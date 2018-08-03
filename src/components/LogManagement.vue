@@ -16,7 +16,7 @@
                     </ul>    
                 </div>
         
-                <div id="location">
+                <div id="location" v-if="tabs[0].isSelected">
                     <div class="item-left">省份</div>
                     <Select v-model="province" size="large" style="width:100px" placeholder="">
                         <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
@@ -35,15 +35,15 @@
 
                 <div id="time">
                     <div class="item-left" >时间</div>
-                    <DatePicker class="date-picker" type="date" placeholder="选择日期"></DatePicker>
+                    <DatePicker v-model="startTime" class="date-picker" type="date" placeholder="选择日期"></DatePicker>
                     <div class="item-left">至</div>
-                    <DatePicker class="date-picker" type="date" placeholder="选择日期"></DatePicker>
+                    <DatePicker v-model="endTime" class="date-picker" type="date" placeholder="选择日期"></DatePicker>
                     <Input 
                         v-model="macValue" 
                         placeholder="输入MAC等" 
                         style="width: 100px; margin-left: 56px;">
                     </Input>
-                    <Button type="primary" style="margin-left: 15px;">搜索</Button>
+                    <Button type="primary" style="margin-left: 15px;" @click="searchDisplay()">搜索</Button>
                 </div>
             </div>
 
@@ -68,7 +68,7 @@
 </template>
 
 <script>
-
+var moment = require('moment');
 export default {
     name: 'LogManagement',
     data(){
@@ -118,7 +118,7 @@ export default {
         province: '',
         city: '',
         hospital: '',
-        macValue: '',
+       
 
         columns1: [
         {
@@ -153,55 +153,14 @@ export default {
         }
         ],
 
-        tableData: [
-        {
-            hospital: 'John Brown',
-            section: 18,
-            address: 'New York No. 1 Lake Park',
-            date: '2016-10-03'
-        },
-        {
-            hospital: 'Jim Green',
-            section: 24,
-            address: 'London No. 1 Lake Park',
-            date: '2016-10-01'
-        },
-        {
-            hospital: 'Joe Black',
-            section: 30,
-            address: 'Sydney No. 1 Lake Park',
-            date: '2016-10-02'
-        },
-        {
-            hospital: 'Jon Snow',
-            section: 26,
-            address: 'Ottawa No. 2 Lake Park',
-            date: '2016-10-04'
-        },
-        {
-            hospital: 'Jon',
-            section: 26,
-            address: 'Ottawa No. 2 Lake Park',
-            date: '2016-10-04'
-        },
-        {
-            hospital: 'JSnow',
-            section: 26,
-            address: 'Ottawa No. 2 Lake Park',
-            date: '2016-10-04'
-        },
-        {
-            hospital: 'Snow',
-            section: 26,
-            address: 'Ottawa No. 2 Lake Park',
-            date: '2016-10-04'
-        },
-        ],
-        
-        datacount: 0,
-        pageSize: 5,
+        tableData: [],
+        dataCount: 0,
+        pageSize: 6,
         ajaxData: [],
-        
+        // allData: [],
+        macValue: 'F0-03-8C-35-D8-B1',
+        startTime: '2018-07-01 00:00:00',
+        endTime: '2018-07-27 00:00:00'
         
     }  
   },
@@ -218,18 +177,73 @@ export default {
             })   
         },
 
-        handleListApproveHistory(){ 
-            // 保存取到的所有数据
-            this.ajaxData = this.tableData
-            this.dataCount = this.tableData.length;
-            // 初始化显示，小于每页显示条数，全显，大于每页显示条数，取前每页条数显示
-            if(this.tableData.length < this.pageSize){
-                this.tableData = this.ajaxData;
-            }
-            else{
-                this.tableData = this.ajaxData.slice(0,this.pageSize);
-            }
+        searchDisplay(){
+            this.requestTableData(this.startTime, this.endTime, this.macValue)
+            console.log(this.tableData);
         },
+        
+        // handleListApproveHistory(){ 
+        //     // 保存取到的所有数据
+        //     this.ajaxData = this.allData
+        //     this.dataCount = this.allData.length;
+        //     console.log(this.ajaxData.length);
+        //     // 初始化显示，小于每页显示条数，全显，大于每页显示条数，取前每页条数显示
+        //     if(this.ajaxData.length < this.pageSize){
+        //         this.tableData = this.ajaxData;
+        //         console.log("if"+this.pageSize);
+        //     }
+        //     else{
+        //         this.tableData = this.ajaxData.slice(0,this.pageSize);
+        //         console.log("else"+this.pageSize);
+        //     }
+        // },
+
+        requestTableData(st, et, uid){
+			this.$http.get('/new/flylog-search-web/customLogSearch/getWordCount.do', {
+			params: {
+				startTime: moment(st).format("YYYY-MM-DD HH:mm:ss"),
+				endTime: moment(et).format("YYYY-MM-DD HH:mm:ss"),
+				//pageSize: this.pageSize,
+                platform: 'siat',
+                Uid: uid
+			}
+			})
+			.then((response) => {
+             
+                let res = response.data.data;
+                console.log(response);
+                let allData = [];
+                for(var i in res.medicals){
+
+                       
+                    allData.push({
+                        nums : parseInt(i)+1,
+                        // this.tableData[i].hospital = res[i].hosName;
+                        section : res.Section,
+                        address : this.macValue,
+                        date : res.medicals[i].timestamp,
+                        content : res.medicals[i].result,
+                    });
+
+                    this.ajaxData = allData
+                    this.dataCount = allData.length;
+                    // console.log(this.ajaxData.length);
+                    if(this.ajaxData.length < this.pageSize){
+                        this.tableData = this.ajaxData;
+                        // console.log("if"+this.pageSize);
+                    }
+                    else{
+                        this.tableData = this.ajaxData.slice(0,this.pageSize);
+                        // console.log("else"+this.pageSize);
+                    }
+                }		
+			})
+			.catch(function (error) {
+				console.log(error);
+			})
+			.then(function () {              
+			});  
+		},
 
         changepage(index){
             var _start = ( index - 1 ) * this.pageSize;
@@ -238,8 +252,8 @@ export default {
         }
     },
     
-    created(){
-            this.handleListApproveHistory();
+    mounted(){
+        this.requestTableData(this.startTime,this.endTime,this.macValue);
     },
 }
 </script>
