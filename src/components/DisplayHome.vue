@@ -31,9 +31,9 @@
 				<div>{{value.name}}</div>
 				<div><img :src='value.link'></div>
 
-				<div class="display-num" v-if="tabs[0].isSelected">{{value.privateNum}}</div>
-				<div class="display-num" v-if="tabs[1].isSelected">{{value.publicNum}}</div>
-				<div class="display-num" v-else>{{value.totalNum}}</div>
+				<div class="display-num" v-if="tabs[0].isSelected">{{value.publicNum}}</div>
+				<div class="display-num" v-if="tabs[1].isSelected">{{value.privateNum}}</div>
+				<div class="display-num" v-if="tabs[2].isSelected">{{value.publicNum + value.privateNum}}</div>
 			</div>
 			<div class="card" style="visibility: hidden; padding: 0px 0px;">
 				<div>1</div>
@@ -123,7 +123,7 @@
 		
 		<!-- Display three chasrts each time, use to pass parameters -->
       	<div class="canvas-for-chart" id="chart1">
-			<ChartDisplayUser v-if="chartClass[0].isSelected" :startdate="startTime.toString()" :enddate="endTime.toString()"></ChartDisplayUser>
+			<ChartDisplayUser v-if="chartClass[0].isSelected" :startdate="startTime" :enddate="endTime"></ChartDisplayUser>
 			<ChartDisplayInput v-if="chartClass[1].isSelected" :startdate="startTime" :enddate="endTime"></ChartDisplayInput>
 			<ChartDisplayWord v-if="chartClass[2].isSelected" :startdate="startTime" :enddate="endTime"></ChartDisplayWord>
 			<ChartDisplayTime v-if="chartClass[3].isSelected" :startdate="startTime" :enddate="endTime"></ChartDisplayTime>
@@ -192,23 +192,23 @@ export default {
 		{
 			name: "累计输入字数",
 			link:require("@/assets/icon5.png"),
-			privateNum: 3535,
-			publicNum: 1,
-			totalNum: null,
+			privateNum: 0,
+			publicNum: 0,
+			totalNum: 0,
 		},
 		{
 			name: "累计调用次数",
 			link: require("@/assets/icon6.png"),
-			privateNum: null,
-			publicNum: 1,
-			totalNum: null,
+			privateNum: 0,
+			publicNum: 0,
+			totalNum: 0,
 		},
 		{
 			name: "累计录音时间",
 			link: require("@/assets/icon7.png"),
-			privateNum: 320,
-			publicNum: 1,
-			totalNum: null,
+			privateNum: 0,
+			publicNum: 0,
+			totalNum: 0,
 		}
 		],
 
@@ -297,10 +297,35 @@ export default {
 		},
 
     	requestNum(){
+			this.$http.get('/new/flylog-search-web/customLogSearch/getWordCount.do', {
+			params: {
+				startTime: moment(this.startTime).format("YYYY-MM-DD HH:mm:ss"),
+				endTime: moment(this.endTime).format("YYYY-MM-DD HH:mm:ss"),
+				Uid: "",
+				platform: 'siat',
+			}
+			})
+			.then((response) => {
+				console.log(response);
+				// var nums = 0;
+				var res =  response.data.data;
+				// var lognums = res.totalTime;
+				this.totalInput[2].privateNum = res.totalTime;
+				this.totalInput[0].privateNum = res.count;
+			})
+			.catch(function (error) {
+				console.log(error);
+			})
+			.then(function () {
+				// always executed
+      		});  
+
+
+
 			this.$http.get('/api/flylog-search-web/api/timeline.do', {
 			params: {
-				startTime: '2018-07-01 00:00:00',
-				endTime: '2018-07-26 00:00:00',
+				startTime: moment(this.startTime).format("YYYY-MM-DD HH:mm:ss"),
+				endTime: moment(this.endTime).format("YYYY-MM-DD HH:mm:ss"),
 				platform: 'siat',
 			}
 			})
@@ -315,7 +340,10 @@ export default {
 			})
 			.then(function () {
 				// always executed
-      		});  
+			});  
+			// this.totalInput[0].totalNum = this.totalInput[0].privateNum + this.totalInput[0].publicNum;   
+			// this.totalInput[1].totalNum = this.totalInput[1].privateNum + this.totalInput[0].publicNum;   
+			
     	},
 
 		requestUserNum(){

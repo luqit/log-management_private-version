@@ -246,14 +246,6 @@
             }   
         },
 
-
-        // created () {
-        //     // make charts adaptive to the window size
-        //     this.getXData();
-        //     console.log("create" + this.XData)
-    
-        // },
-
         created(){
             // console.log("2222");
             this.getXData();
