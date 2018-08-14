@@ -9,14 +9,14 @@
         </div>
         <div id="myChart" :style="{width: '100%', height: '300px'}"></div>
 
-        <div class="chart-header">
+        <div class="chart-header" :class="{'is-active': isdisplay}">
             <div class="chart-title">医院用户数排名</div>
             <div style="float: right;">
                 <Button type="primary">刷新</Button>
                 <Button>列表详情</Button>
             </div>
         </div>
-        <div id="rankChart" :style="{width: '100%', height: '300px'}"></div>
+        <div id="rankChart" :style="{width: '100%', height: '300px'}" :class="{'is-active': isdisplay}"></div>
 
         
         <div class="chart-header">
@@ -47,7 +47,9 @@
                 default: function(){
                     return ''
                 }
-            },          
+            },  
+            
+            isdisplay: 0,          
         },
         data () {
             return {
@@ -55,22 +57,60 @@
                 chart2: {},
                 chart3: {},
                 // XData: ["05-16","05-17","05-18","05-19","05-20","05-21"],
-                XData: [1,2,3,4,5,6],
+                dayXData: [],
+                dayYData: [],
+                sectionXData: [],
+                sectionYData: [],
             }
         },
 
         methods: {
 
-            getXData(){
-                this.$http.get('/api/flylog-search-web/api/getLogs.do', {
-                params: {
-                    startTime: moment(this.startdate).format("YYYY-MM-DD HH:mm:ss"),
-                    endTime: moment(this.enddate).format("YYYY-MM-DD HH:mm:ss"),
-                    platform: 'siat',
-                }
-                })
-                .then((response) => {    
-                    this.XData = ["05-16","05-17","05-18","05-19","05-20","05-21"];
+            getData(){
+                console.log(this.startdate);
+                console.log(this.enddate);
+                let postData = this.$qs.stringify({
+					startTime: this.startdate,
+					endTime: this.enddate,
+					platform: 'siat',
+                });
+                
+                this.$http.post('/new/flylog-search-web/customLogSearch/getChart.do', postData)
+                .then((response) => { 
+                    console.log(response.data.data);  
+                    var rs = response.data.data;
+                    var datax = [];
+                    var datay = [];
+                    var dataxx = [];
+                    var datayy = [];
+                    
+                    // var sortedDays = Object.keys(rs.day).sort(function(a, b) {
+                    //     return Date.parse(a) < Date.parse(b);
+                    // });
+                    var sortedDays = Object.keys(rs.day).sort();
+
+                    for(var i in sortedDays){
+                        datax.push(sortedDays[i].slice(5));
+                        datay.push(rs.day[sortedDays[i]].uidCount);
+                    }
+                   
+                    this.dayXData = datax;
+                    this.dayYData = datay;
+                       
+                    var sortedSections = Object.keys(rs.section).sort(function(a, b) {
+                        return rs.section[b].uidCount - rs.section[a].uidCount;
+                    });
+
+                    // var sortedSections = Object.keys(rs.section).sort();
+
+                    for (var index in sortedSections) {
+                        dataxx.push(sortedSections[index]);
+                        datayy.push(rs.section[sortedSections[index]].uidCount);
+                    }
+                    console.log(sortedSections);           
+                    this.sectionXData = dataxx;
+                    this.sectionYData = datayy;                    
+                    
                     let echarts = this.drawCharts()
                     this.chart1 = echarts.myChart
                     this.chart2 = echarts.rankChart
@@ -79,7 +119,6 @@
                         this.chart1.resize()
                         this.chart2.resize()
                         this.chart3.resize()
-
                     }
                 })
                 .catch(function (error) {
@@ -89,8 +128,6 @@
                     // always executed
                 });  
             },
-
-            getYData(){},
 
             drawCharts(){
                 let myChart = this.$echarts.init(document.getElementById('myChart'))
@@ -117,7 +154,7 @@
                             }
                         },
                         // data: ["05-16","05-17","05-18","05-19","05-20","05-21"]
-                        data: this.XData
+                        data: this.dayXData
                     },
 
                     yAxis: {
@@ -132,11 +169,11 @@
                         type: 'line',
                         symbol: 'circle',
                         color: "#52baf8",
-                        symbolSize: 18,
+                        symbolSize: 15,
                         itemStyle:{
                             normal:{
                                 borderColor: 'white',
-                                borderWidth: 3,
+                                borderWidth: 2,
                                 shadowColor: 'rgba(0, 0, 0, 0.2)',
                                 shadowBlur: 5,
                                 lineStyle:{
@@ -144,7 +181,7 @@
                                 }
                             }
                         },
-                        data: [5, 20, 36, 10, 10, 20],
+                        data: this.dayYData,
                         markPoint: {
                         data: [
                             {type: 'max', name: '最大值'},
@@ -217,7 +254,7 @@
                                 color:'#979797'
                             }
                         },
-                        data: ["05-16","05-17","05-18","05-19","05-20","05-21","05-22"]
+                        data: this.sectionXData,
                     },
                     yAxis: {
                         axisLine:{
@@ -238,7 +275,7 @@
                                 }
                             }
                         },
-                        data: [5, 20, 36, 10, 10, 20, 16],
+                        data: this.sectionYData,
                     }]
                 });
 
@@ -246,12 +283,9 @@
             }   
         },
 
-        created(){
-            // console.log("2222");
-            this.getXData();
-            // console.log("mount" + this.XData)
-    
-        }
+        mounted(){
+            this.getData();
+        },
 
     }
 </script>
@@ -272,6 +306,9 @@
         font-weight: bold; 
         margin-top: 7px;
     }
+    .is-active {
+        display: none;
+    }
     #container {
         background: white;
         margin-top: 14px;
@@ -284,4 +321,5 @@
     #rankChart {
        width: 100%;
     }
+
 </style>

@@ -21,7 +21,7 @@
 					{{value.publicNum}}
 				</div>
 				<div class="display-num" v-else>
-					{{value.totalNum}}
+					{{value.privateNum + value.publicNum}}
 				</div>
        	 	</div>
       	</div>
@@ -123,10 +123,10 @@
 		
 		<!-- Display three chasrts each time, use to pass parameters -->
       	<div class="canvas-for-chart" id="chart1">
-			<ChartDisplayUser v-if="chartClass[0].isSelected" :startdate="startTime" :enddate="endTime"></ChartDisplayUser>
-			<ChartDisplayInput v-if="chartClass[1].isSelected" :startdate="startTime" :enddate="endTime"></ChartDisplayInput>
-			<ChartDisplayWord v-if="chartClass[2].isSelected" :startdate="startTime" :enddate="endTime"></ChartDisplayWord>
-			<ChartDisplayTime v-if="chartClass[3].isSelected" :startdate="startTime" :enddate="endTime"></ChartDisplayTime>
+			<ChartDisplayUser v-if="chartClass[0].isSelected" :startdate="tableStartTime" :enddate="tableEndTime" :isdisplay="tabs[1].isSelected" ref="chart1"></ChartDisplayUser>
+			<ChartDisplayInput v-if="chartClass[1].isSelected" :startdate="tableStartTime" :enddate="tableEndTime" :isdisplay="tabs[1].isSelected" ref="chart2"></ChartDisplayInput>
+			<ChartDisplayWord v-if="chartClass[2].isSelected" :startdate="tableStartTime" :enddate="tableEndTime" :isdisplay="tabs[1].isSelected" ref="chart3"></ChartDisplayWord>
+			<ChartDisplayTime v-if="chartClass[3].isSelected" :startdate="tableStartTime" :enddate="tableEndTime" :isdisplay="tabs[1].isSelected" ref="chart4"></ChartDisplayTime>
 		</div>
      
   	</div> 
@@ -283,6 +283,15 @@ export default {
   	}
 },
 
+	computed: {
+		tableStartTime: function(){
+			return moment(this.startTime).format("YYYY-MM-DD HH:mm:ss");
+		},
+		tableEndTime: function(){
+			return moment(this.endTime).format("YYYY-MM-DD HH:mm:ss")
+		},
+	},
+
  	methods: {
 
 		selectTab(selectedTab) {
@@ -367,26 +376,58 @@ export default {
 		},
 
 		searchDisplay(){
-			this.$http.get('/api/flylog-search-web/api/timeline.do', {
-			params: {
-				startTime:  moment(this.startTime).format("YYYY-MM-DD HH:mm:ss"),
-				endTime: moment(this.endTime).format("YYYY-MM-DD HH:mm:ss"),
-				platform: 'siat',
+			if(this.tabs[0].isSelected){
+				this.$http.get('/api/flylog-search-web/api/timeline.do', {
+				params: {
+					startTime: moment(this.startTime).format("YYYY-MM-DD HH:mm:ss"),
+					endTime: moment(this.endTime).format("YYYY-MM-DD HH:mm:ss"),
+					platform: 'siat',
+				}
+				})
+				.then((response) => {
+					var nums = 0;
+					var lognums = response.data.logCount;
+					lognums.forEach(value => nums += value);
+					this.usage[2].searchNum = nums;
+					// console.log(this.usage[1].searchNum);
+					// this.$refs.chart1.getData();
+					// this.$refs.chart2.getData();
+					// this.$refs.chart3.getData();
+					// this.$refs.chart4.getData();
+				})
+				.catch(function (error) {
+					console.log(error);
+				})
+				.then(function () {
+					// always executed
+				}); 
 			}
-			})
-			.then((response) => {
-				var nums = 0;
-				var lognums = response.data.logCount;
-				lognums.forEach(value => nums += value);
-				this.usage[2].searchNum = nums;
-				// console.log(this.usage[1].searchNum);
-			})
-			.catch(function (error) {
-				console.log(error);
-			})
-			.then(function () {
-				// always executed
-			});        
+			
+			if(this.tabs[1].isSelected){
+				this.usage[0].searchNum = 1;
+				let postData = this.$qs.stringify({
+					startTime: moment(this.startTime).format("YYYY-MM-DD HH:mm:ss"),
+					endTime: moment(this.endTime).format("YYYY-MM-DD HH:mm:ss"),
+					platform: 'siat',
+				});
+				this.$http.post('/new/flylog-search-web/customLogSearch/getUidAndSectionCount.do', postData)
+				.then((response) => {
+					console.log(response);
+					let res = response.data.data;
+					this.usage[1].searchNum = this.usage[2].searchNum = res.uidCount;
+					this.usage[3].searchNum = res.sectionCount; 
+					this.$refs.chart1.getData();
+					this.$refs.chart2.getData();
+					this.$refs.chart3.getData();
+					this.$refs.chart4.getData();
+				})
+				.catch(function (error) {
+					console.log(error);
+				})
+				.then(function () {
+					// always executed
+				}); 				
+			}	
 		},
 
 		computeTimeSlot(preDays){
@@ -409,7 +450,7 @@ export default {
 					break;
 				case(1):
 					this.computeTimeSlot(1);
-					this.endTime = moment(this.endTime).startOf('day').format("YYYY-MM-DD HH:mm:ss");
+					this.endTime = moment(this.endTime).startOf('day').subtract(1, 'seconds').format("YYYY-MM-DD HH:mm:ss");
 					break;
 				case(2):
 					this.computeTimeSlot(7);

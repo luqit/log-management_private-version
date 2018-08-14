@@ -218,11 +218,12 @@ export default {
                        
                     allData.push({
                         nums : parseInt(i)+1,
-                        // this.tableData[i].hospital = res[i].hosName;
+                        hospital : "-",
                         section : res.Section,
                         address : this.macValue,
                         date : res.medicals[i].timestamp,
                         content : res.medicals[i].result,
+                        section : res.medicals[i].section, 
                     });
 
                     this.ajaxData = allData

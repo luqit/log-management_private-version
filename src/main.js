@@ -7,6 +7,7 @@ import App from './App'
 import router from './router'
 import IView from 'iview'
 import echarts from 'echarts'
+import qs from 'qs'
 import 'iview/dist/styles/iview.css'
 
 Vue.use(VueRouter);
@@ -16,6 +17,7 @@ Vue.config.productionTip = false
 
 Vue.prototype.$http = axios
 Vue.prototype.$echarts = echarts
+Vue.prototype.$qs = qs;
 Vue.prototype.$goRoute = function (index) {
   this.$router.push(index)
   console.log(index)
