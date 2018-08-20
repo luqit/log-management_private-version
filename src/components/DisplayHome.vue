@@ -77,15 +77,14 @@
 					class="date-picker" 
 					type="date" 
 					placeholder="选择日期"
-					v-model="startTime" 
-					@on-change="print()">
+					v-model="startTime">
 				</DatePicker>
 				<div class="item-left">至</div>
 				<DatePicker 
 					class="date-picker" 
 					type="date" 
 					placeholder="选择日期"
-					:value="endTime">
+					v-model="endTime">
 				</DatePicker>
 
 				<div style="display: inline-block; margin-left: 56px;">
@@ -316,9 +315,7 @@ export default {
 			})
 			.then((response) => {
 				console.log(response);
-				// var nums = 0;
 				var res =  response.data.data;
-				// var lognums = res.totalTime;
 				this.totalInput[2].privateNum = res.totalTime;
 				this.totalInput[0].privateNum = res.count;
 			})
@@ -328,7 +325,6 @@ export default {
 			.then(function () {
 				// always executed
       		});  
-
 
 
 			this.$http.get('/api/flylog-search-web/api/timeline.do', {
@@ -350,20 +346,16 @@ export default {
 			.then(function () {
 				// always executed
 			});  
-			// this.totalInput[0].totalNum = this.totalInput[0].privateNum + this.totalInput[0].publicNum;   
-			// this.totalInput[1].totalNum = this.totalInput[1].privateNum + this.totalInput[0].publicNum;   
 			
     	},
 
 		requestUserNum(){
-			this.$http.get('/api/flylog-search-web/api/getLogStat.do', {
-			params: {
-				startTime: '2018-07-26 00:00:00',
-				endTime: '2018-07-26 09:59:00',
+			let postData = this.$qs.stringify({
+				startTime: '2000-01-01 00:00:00',
+				endTime: moment().format('YYYY-MM-DD HH:mm:ss'),
 				platform: 'siat',
-				aggQuery: "select count(*) uid"
-			}
-			})
+            });
+			this.$http.post('/new/flylog-search-web/customLogSearch/getUidAndSectionCount.do', postData)
 			.then((response) => {
 				console.log(response);
 			})
@@ -371,7 +363,6 @@ export default {
 				console.log(error);
 			})
 			.then(function () {
-				// always executed
 			});  
 		},
 
@@ -389,11 +380,6 @@ export default {
 					var lognums = response.data.logCount;
 					lognums.forEach(value => nums += value);
 					this.usage[2].searchNum = nums;
-					// console.log(this.usage[1].searchNum);
-					// this.$refs.chart1.getData();
-					// this.$refs.chart2.getData();
-					// this.$refs.chart3.getData();
-					// this.$refs.chart4.getData();
 				})
 				.catch(function (error) {
 					console.log(error);
@@ -467,7 +453,7 @@ export default {
   
 	mounted() {
 		this.requestNum();
-		// this.requestUserNum();	
+		this.requestUserNum();	
 	} 
 }
 </script>
@@ -526,7 +512,6 @@ export default {
 		height:352px;
 	}
 	#tabpane {
-		/* display: box; */
 		width: 100%;   
 		height: 62px; 
 		border-bottom: 2px solid #e4e4e4;   

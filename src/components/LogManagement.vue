@@ -68,261 +68,235 @@
 </template>
 
 <script>
-var moment = require('moment');
+var moment = require("moment");
 export default {
-    name: 'LogManagement',
-    data(){
-    return{
-        tabs: [
+  name: "LogManagement",
+  data() {
+    return {
+      tabs: [
         {
-            name: "公有云", 
-            isSelected: true,
+          name: "公有云",
+          isSelected: true
         },
         {
-            name: "私有云", 
-            isSelected: false,
+          name: "私有云",
+          isSelected: false
         },
         {
-            name: "总计", 
-            isSelected: false,
-        },
-        ],
-
-        cityList: [
-        {
-            value: 'New York',
-            label: 'New York'
-        },
-        {
-            value: 'London',
-            label: 'London'
-        },
-        {
-            value: 'Sydney',
-            label: 'Sydney'
-        },
-        {
-            value: 'Ottawa',
-            label: 'Ottawa'
-        },
-        {
-            value: 'Paris',
-            label: 'Paris'
-        },
-        {
-            value: 'Canberra',
-            label: 'Canberra'
+          name: "总计",
+          isSelected: false
         }
-        ],
+      ],
 
-        province: '',
-        city: '',
-        hospital: '',
-       
-
-        columns1: [
+      cityList: [
         {
-            type: 'selection',
-            width: 60,
-            align: 'center'
+          value: "New York",
+          label: "New York"
         },
         {
-            title: '序号',
-            key: 'nums',
-            width: 100,
+          value: "London",
+          label: "London"
         },
         {
-            title: '医院',
-            key: 'hospital'
+          value: "Sydney",
+          label: "Sydney"
         },
         {
-            title: '科室',
-            key: 'section'
+          value: "Ottawa",
+          label: "Ottawa"
         },
         {
-            title: 'MAC地址',
-            key: 'address'
+          value: "Paris",
+          label: "Paris"
         },
         {
-            title: '时间',
-            key: 'date', 
-        },
-        {
-            title: '转录内容',
-            key: 'content',
+          value: "Canberra",
+          label: "Canberra"
         }
-        ],
+      ],
 
-        tableData: [],
-        dataCount: 0,
-        pageSize: 6,
-        ajaxData: [],
-        // allData: [],
-        macValue: 'F0-03-8C-35-D8-B1',
-        startTime: '2018-07-01 00:00:00',
-        endTime: '2018-07-27 00:00:00'
-        
-    }  
+      province: "",
+      city: "",
+      hospital: "",
+
+      columns1: [
+        {
+          type: "selection",
+          width: 60,
+          align: "center"
+        },
+        {
+          title: "序号",
+          key: "nums",
+          width: 100
+        },
+        {
+          title: "医院",
+          key: "hospital"
+        },
+        {
+          title: "科室",
+          key: "section"
+        },
+        {
+          title: "MAC地址",
+          key: "address"
+        },
+        {
+          title: "时间",
+          key: "date"
+        },
+        {
+          title: "转录内容",
+          key: "content"
+        }
+      ],
+
+      tableData: [],
+      dataCount: 0,
+      pageSize: 6,
+      ajaxData: [],
+      macValue: "F0-03-8C-35-D8-B1",
+      startTime: "2018-07-01 00:00:00",
+      endTime: "2018-07-27 00:00:00"
+    };
   },
 
-    methods: {
-        /**
-         * When clicking the tab,
-         * add the bottom border
-         */
-        selectTab(selectedTab) {
-            this.tabs.forEach(tab => {
-                tab.isSelected = (tab.name == selectedTab.name);
-                console.log(tab.isSelected);
-            })   
-        },
-
-        searchDisplay(){
-            this.requestTableData(this.startTime, this.endTime, this.macValue)
-            console.log(this.tableData);
-        },
-        
-        // handleListApproveHistory(){ 
-        //     // 保存取到的所有数据
-        //     this.ajaxData = this.allData
-        //     this.dataCount = this.allData.length;
-        //     console.log(this.ajaxData.length);
-        //     // 初始化显示，小于每页显示条数，全显，大于每页显示条数，取前每页条数显示
-        //     if(this.ajaxData.length < this.pageSize){
-        //         this.tableData = this.ajaxData;
-        //         console.log("if"+this.pageSize);
-        //     }
-        //     else{
-        //         this.tableData = this.ajaxData.slice(0,this.pageSize);
-        //         console.log("else"+this.pageSize);
-        //     }
-        // },
-
-        requestTableData(st, et, uid){
-			this.$http.get('/new/flylog-search-web/customLogSearch/getWordCount.do', {
-			params: {
-				startTime: moment(st).format("YYYY-MM-DD HH:mm:ss"),
-				endTime: moment(et).format("YYYY-MM-DD HH:mm:ss"),
-				//pageSize: this.pageSize,
-                platform: 'siat',
-                Uid: uid
-			}
-			})
-			.then((response) => {
-             
-                let res = response.data.data;
-                console.log(response);
-                let allData = [];
-                for(var i in res.medicals){
-
-                       
-                    allData.push({
-                        nums : parseInt(i)+1,
-                        hospital : "-",
-                        section : res.Section,
-                        address : this.macValue,
-                        date : res.medicals[i].timestamp,
-                        content : res.medicals[i].result,
-                        section : res.medicals[i].section, 
-                    });
-
-                    this.ajaxData = allData
-                    this.dataCount = allData.length;
-                    // console.log(this.ajaxData.length);
-                    if(this.ajaxData.length < this.pageSize){
-                        this.tableData = this.ajaxData;
-                        // console.log("if"+this.pageSize);
-                    }
-                    else{
-                        this.tableData = this.ajaxData.slice(0,this.pageSize);
-                        // console.log("else"+this.pageSize);
-                    }
-                }		
-			})
-			.catch(function (error) {
-				console.log(error);
-			})
-			.then(function () {              
-			});  
-		},
-
-        changepage(index){
-            var _start = ( index - 1 ) * this.pageSize;
-            var _end = index * this.pageSize;
-            this.tableData = this.ajaxData.slice(_start,_end);
-        }
+  methods: {
+    /**
+     * When clicking the tab,
+     * add the bottom border
+     */
+    selectTab(selectedTab) {
+      this.tabs.forEach(tab => {
+        tab.isSelected = tab.name == selectedTab.name;
+        console.log(tab.isSelected);
+      });
     },
-    
-    mounted(){
-        this.requestTableData(this.startTime,this.endTime,this.macValue);
+
+    searchDisplay() {
+      this.requestTableData(this.startTime, this.endTime, this.macValue);
+      console.log(this.tableData);
     },
-}
+
+    requestTableData(st, et, uid) {
+      this.$http
+        .get("/new/flylog-search-web/customLogSearch/getWordCount.do", {
+          params: {
+            startTime: moment(st).format("YYYY-MM-DD HH:mm:ss"),
+            endTime: moment(et).format("YYYY-MM-DD HH:mm:ss"),
+            platform: "siat",
+            Uid: uid
+          }
+        })
+        .then(response => {
+          let res = response.data.data;
+          console.log(response);
+          let allData = [];
+          for (var i in res.medicals) {
+            allData.push({
+              nums: parseInt(i) + 1,
+              hospital: "-",
+              section: res.Section,
+              address: this.macValue,
+              date: res.medicals[i].timestamp,
+              content: res.medicals[i].result,
+              section: res.medicals[i].section
+            });
+
+            this.ajaxData = allData;
+            this.dataCount = allData.length;
+            if (this.ajaxData.length < this.pageSize) {
+              this.tableData = this.ajaxData;
+            } else {
+              this.tableData = this.ajaxData.slice(0, this.pageSize);
+            }
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        })
+        .then(function() {});
+    },
+
+    changepage(index) {
+      var _start = (index - 1) * this.pageSize;
+      var _end = index * this.pageSize;
+      this.tableData = this.ajaxData.slice(_start, _end);
+    }
+  },
+
+  mounted() {
+    this.requestTableData(this.startTime, this.endTime, this.macValue);
+  }
+};
 </script>
 
 
 <style scoped>
-    ul {list-style-type: none;}
-    ul, li { 
-        margin:0;
-        padding: 0;
-        text-align: center;
-    }
-    .ivu-table td{
-        height: 60px;
-    }
-    .tabs>li {
-        float: left;
-        width: 33.333333%;
-    }
-    .tabs>li>.content {
-        height: 62px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .ivu-tabs-ink-bar {
-        width: 150px;
-    }
-    .is-active {
-        border-bottom: 3px solid #248fff;
-    }
-    .date-picker {
-      /* margin-left: 46px; */
-      width: 100px;
-    }
-    .item-left {
-        display: inline-block; 
-        width: 52px; 
-        text-align: right;
-    }
-    .paging{
-        float: right;
-        margin-top:10px;
-    }
-        
-    #tabpane {
-        width: 100%;   
-        height: 62px; 
-        border-bottom: 2px solid #e4e4e4; 
-        font-size: 18px;
-        font-weight: bold;
-        color: #666666;        
-    }
-    #container{
-        /* background: white; */
-        width: 100%;
-        min-width: 1008px;
-        margin-right: 66px;
-        height: 160px;
-    }
-    #location, #time {
-        margin-top: 10px;
-        text-align: left;    
-    }
+ul {
+  list-style-type: none;
+}
+ul,
+li {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+.ivu-table td {
+  height: 60px;
+}
+.tabs > li {
+  float: left;
+  width: 33.333333%;
+}
+.tabs > li > .content {
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ivu-tabs-ink-bar {
+  width: 150px;
+}
+.is-active {
+  border-bottom: 3px solid #248fff;
+}
+.date-picker {
+  width: 100px;
+}
+.item-left {
+  display: inline-block;
+  width: 52px;
+  text-align: right;
+}
+.paging {
+  float: right;
+  margin-top: 10px;
+}
 
-    #time {    
-        margin: 10px 0px;   
-        margin-bottom: 22px; 
-    }
+#tabpane {
+  width: 100%;
+  height: 62px;
+  border-bottom: 2px solid #e4e4e4;
+  font-size: 18px;
+  font-weight: bold;
+  color: #666666;
+}
+#container {
+  width: 100%;
+  min-width: 1008px;
+  margin-right: 66px;
+  height: 160px;
+}
+#location,
+#time {
+  margin-top: 10px;
+  text-align: left;
+}
 
+#time {
+  margin: 10px 0px;
+  margin-bottom: 22px;
+}
 </style>
