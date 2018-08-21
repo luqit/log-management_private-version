@@ -92,9 +92,10 @@ export default {
 
         logName: '', //登录名
         userStatus: '', //用户状态
-        datacount: 0, // 搜索结果的数量
-        pageSize: 5, // 表格每页显示的数据条数
+        dataCount: 0, // 搜索结果的数量
+        pageSize: 6, // 表格每页显示的数据条数
         ajaxData: [], //搜索结果
+        accountData: [],
     }
   },
 
@@ -104,8 +105,13 @@ export default {
     selectTab(selectedTab) {
         this.tabs.forEach(tab => {
           tab.isSelected = (tab.name == selectedTab.name);
-          console.log(tab.isSelected);
         })
+    },
+
+    changepage(index) {
+        var _start = (index - 1) * this.pageSize;
+        var _end = index * this.pageSize;
+        this.tableData = this.ajaxData.slice(_start, _end);
     },
 
   },

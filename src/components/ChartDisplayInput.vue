@@ -54,10 +54,9 @@
         },
         data () {
             return {
-                chart1: {},
-                chart2: {},
-                chart3: {},
-                // XData: ["05-16","05-17","05-18","05-19","05-20","05-21"],
+                myChart: {},
+                rankChart: {},
+                rankChart2: {},
                 dayXData: [],
                 dayYData: [],
                 sectionXData: [],
@@ -68,8 +67,8 @@
         methods: {
 
             getData(){
-                console.log(this.startdate);
-                console.log(this.enddate);
+                this.setChartLoading();
+
                 let postData = this.$qs.stringify({
 					startTime: this.startdate,
 					endTime: this.enddate,
@@ -78,7 +77,6 @@
                 
                 this.$http.post('/new/flylog-search-web/customLogSearch/getChart.do', postData)
                 .then((response) => { 
-                    console.log(response.data.data);  
                     var rs = response.data.data;
                     var datax = [];
                     var datay = [];
@@ -99,24 +97,25 @@
                         return rs.section[b].wordCount - rs.section[a].wordCount;
                     });
 
-                    // var sortedSections = Object.keys(rs.section).sort();
-
                     for (var index in sortedSections) {
-                        dataxx.push(sortedSections[index]);
+                        if(sortedSections[index] == '-'){
+                                dataxx.push('其他');
+                        }
+                        else{
+                            dataxx.push(sortedSections[index]);
+                        }
                         datayy.push(rs.section[sortedSections[index]].wordCount);
-                    }
-                    console.log(sortedSections);           
+                    }           
                     this.sectionXData = dataxx;
                     this.sectionYData = datayy;                    
                     
-                    let echarts = this.drawCharts()
-                    this.chart1 = echarts.myChart
-                    this.chart2 = echarts.rankChart
-                    this.chart3 = echarts.rankChart2
+                    this.drawCharts();
+                    this.cancelChartLoading();
+                
                     window.onresize = () => {
-                        this.chart1.resize()
-                        this.chart2.resize()
-                        this.chart3.resize()
+                        this.myChart.resize()
+                        this.rankChart.resize()
+                        this.rankChart2.resize()
                     }
                 })
                 .catch(function (error) {
@@ -142,7 +141,6 @@
         margin-top: 14px;
     }
     .chart-title {
-        /* display: inline-block;  */
         float: left; 
         color: #979797; 
         font-size: 14px; 

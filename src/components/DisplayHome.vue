@@ -15,10 +15,10 @@
 				</div>
 
 				<div class="display-num" v-if="tabs[0].isSelected">
-					{{value.privateNum}}
+					{{value.publicNum}}
 				</div>
 				<div class="display-num" v-else-if="tabs[1].isSelected">
-					{{value.publicNum}}
+					{{value.privateNum}}
 				</div>
 				<div class="display-num" v-else>
 					{{value.privateNum + value.publicNum}}
@@ -292,7 +292,6 @@ export default {
 	},
 
  	methods: {
-
 		selectTab(selectedTab) {
 			this.tabs.forEach(tab => {
 			tab.isSelected = (tab.name == selectedTab.name);})    
@@ -301,7 +300,6 @@ export default {
 		selectChart(selectedChart) {
 			this.chartClass.forEach(chart => {
 			chart.isSelected = (chart.name === selectedChart.name);})   
-			console.log(this.chartClass); 
 		},
 
     	requestNum(){
@@ -314,7 +312,6 @@ export default {
 			}
 			})
 			.then((response) => {
-				console.log(response);
 				var res =  response.data.data;
 				this.totalInput[2].privateNum = res.totalTime;
 				this.totalInput[0].privateNum = res.count;
@@ -357,7 +354,9 @@ export default {
             });
 			this.$http.post('/new/flylog-search-web/customLogSearch/getUidAndSectionCount.do', postData)
 			.then((response) => {
-				console.log(response);
+				let rs = response.data.data;
+				this.usage[1].privateNum = this.usage[2].privateNum = rs.uidCount;
+				this.usage[3].privateNum = rs.sectionCount;
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -398,14 +397,17 @@ export default {
 				});
 				this.$http.post('/new/flylog-search-web/customLogSearch/getUidAndSectionCount.do', postData)
 				.then((response) => {
-					console.log(response);
 					let res = response.data.data;
 					this.usage[1].searchNum = this.usage[2].searchNum = res.uidCount;
-					this.usage[3].searchNum = res.sectionCount; 
-					this.$refs.chart1.getData();
-					this.$refs.chart2.getData();
-					this.$refs.chart3.getData();
-					this.$refs.chart4.getData();
+					this.usage[3].searchNum = res.sectionCount;
+					if(this.chartClass[0].isSelected) 
+						this.$refs.chart1.getData();
+					if(this.chartClass[1].isSelected)
+						this.$refs.chart2.getData();
+					if(this.chartClass[2].isSelected)
+						this.$refs.chart3.getData();
+					if(this.chartClass[3].isSelected)
+						this.$refs.chart4.getData();
 				})
 				.catch(function (error) {
 					console.log(error);
@@ -425,8 +427,6 @@ export default {
 			let endDate = moment(now2).format("YYYY-MM-DD HH:mm:ss");
 			this.startTime = startDate.toString();
 			this.endTime = endDate.toString();
-			console.log(this.startTime);
-			console.log(this.endTime);
 		},  
 
 		clickShortcut(index){

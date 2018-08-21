@@ -49,10 +49,12 @@
 
             <div id="table">
                 <Table 
+                    :loading="loading" 
                     :columns="columns1" 
                     :data="tableData" 
                     size="large">
                 </Table>
+
                 <Page 
                     :total="dataCount" 
                     show-elevator 
@@ -118,6 +120,11 @@ export default {
       province: "",
       city: "",
       hospital: "",
+      hospitalInTable:     
+      {
+          title: "医院",
+          key: "hospital"
+      },
 
       columns1: [
         {
@@ -152,13 +159,14 @@ export default {
         }
       ],
 
-      tableData: [],
-      dataCount: 0,
-      pageSize: 6,
-      ajaxData: [],
-      macValue: "F0-03-8C-35-D8-B1",
-      startTime: "2018-07-01 00:00:00",
-      endTime: "2018-07-27 00:00:00"
+        loading: true,
+        tableData: [],
+        dataCount: 0,
+        pageSize: 6,
+        ajaxData: [],
+        macValue: "F0-03-8C-35-D8-B1",
+        startTime: "2018-07-01 00:00:00",
+        endTime: "2018-07-27 00:00:00"
     };
   },
 
@@ -170,16 +178,21 @@ export default {
     selectTab(selectedTab) {
       this.tabs.forEach(tab => {
         tab.isSelected = tab.name == selectedTab.name;
-        console.log(tab.isSelected);
       });
+      if(this.tabs[1].isSelected){ 
+        this.columns1.splice(2, 1);
+      }
+      if(this.tabs[0].isSelected || this.tabs[2].isSelected){ 
+        this.columns1.splice(2, 0, this.hospitalInTable); 
+      }
     },
 
     searchDisplay() {
       this.requestTableData(this.startTime, this.endTime, this.macValue);
-      console.log(this.tableData);
     },
 
     requestTableData(st, et, uid) {
+
       this.$http
         .get("/new/flylog-search-web/customLogSearch/getWordCount.do", {
           params: {
@@ -191,7 +204,6 @@ export default {
         })
         .then(response => {
           let res = response.data.data;
-          console.log(response);
           let allData = [];
           for (var i in res.medicals) {
             allData.push({
@@ -212,11 +224,14 @@ export default {
               this.tableData = this.ajaxData.slice(0, this.pageSize);
             }
           }
+            this.loading = false;
         })
         .catch(function(error) {
           console.log(error);
         })
-        .then(function() {});
+        .then(function() {
+  
+        });
     },
 
     changepage(index) {
@@ -234,69 +249,69 @@ export default {
 
 
 <style scoped>
-ul {
-  list-style-type: none;
-}
-ul,
-li {
-  margin: 0;
-  padding: 0;
-  text-align: center;
-}
-.ivu-table td {
-  height: 60px;
-}
-.tabs > li {
-  float: left;
-  width: 33.333333%;
-}
-.tabs > li > .content {
-  height: 62px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.ivu-tabs-ink-bar {
-  width: 150px;
-}
-.is-active {
-  border-bottom: 3px solid #248fff;
-}
-.date-picker {
-  width: 100px;
-}
-.item-left {
-  display: inline-block;
-  width: 52px;
-  text-align: right;
-}
-.paging {
-  float: right;
-  margin-top: 10px;
-}
+    ul {
+        list-style-type: none;
+    }
+    ul,
+    li {
+        margin: 0;
+        padding: 0;
+        text-align: center;
+    }
+    .ivu-table td {
+        height: 60px;
+    }
+    .tabs > li {
+        float: left;
+        width: 33.333333%;
+    }
+    .tabs > li > .content {
+        height: 62px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .ivu-tabs-ink-bar {
+        width: 150px;
+    }
+    .is-active {
+        border-bottom: 3px solid #248fff;
+    }
+    .date-picker {
+        width: 100px;
+    }
+    .item-left {
+        display: inline-block;
+        width: 52px;
+        text-align: right;
+    }
+    .paging {
+        float: right;
+        margin-top: 10px;
+    }
 
-#tabpane {
-  width: 100%;
-  height: 62px;
-  border-bottom: 2px solid #e4e4e4;
-  font-size: 18px;
-  font-weight: bold;
-  color: #666666;
-}
-#container {
-  width: 100%;
-  min-width: 1008px;
-  margin-right: 66px;
-  height: 160px;
-}
-#location,
-#time {
-  margin-top: 10px;
-  text-align: left;
-}
+    #tabpane {
+        width: 100%;
+        height: 62px;
+        border-bottom: 2px solid #e4e4e4;
+        font-size: 18px;
+        font-weight: bold;
+        color: #666666;
+    }
+    #container {
+        width: 100%;
+        min-width: 1008px;
+        margin-right: 66px;
+        height: 160px;
+    }
+    #location,
+    #time {
+        margin-top: 10px;
+        text-align: left;
+    }
 
-#time {
-  margin: 10px 0px;
-  margin-bottom: 22px;
-}
+    #time {
+        margin: 10px 0px;
+        margin-bottom: 22px;
+    }   
 </style>

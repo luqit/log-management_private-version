@@ -1,11 +1,7 @@
 const setChartOption = {
     methods: {
         drawCharts(){
-            let myChart = this.$echarts.init(document.getElementById('myChart'))
-            let rankChart = this.$echarts.init(document.getElementById('rankChart'))
-            let rankChart2 = this.$echarts.init(document.getElementById('rankChart2'))
-
-            myChart.setOption({
+            this.myChart.setOption({
                 grid:{
                     x:70,
                     y:50,
@@ -61,7 +57,7 @@ const setChartOption = {
                 }],
             });
         
-            rankChart.setOption({
+            this.rankChart.setOption({
                 grid:{
                     x:70,
                     y:50,
@@ -105,7 +101,7 @@ const setChartOption = {
                 }]
             });
 
-            rankChart2.setOption({
+            this.rankChart2.setOption({
                 grid:{
                     x:70,
                     y:50,
@@ -150,7 +146,32 @@ const setChartOption = {
             });
 
             return { myChart: myChart, rankChart: rankChart, rankChart2: rankChart2}
-        }   
+        },
+
+        setChartLoading(){
+            this.myChart = this.$echarts.init(document.getElementById('myChart'))
+            this.rankChart = this.$echarts.init(document.getElementById('rankChart'))
+            this.rankChart2 = this.$echarts.init(document.getElementById('rankChart2'))
+
+            this.myChart.showLoading({
+                text: 'loading',
+                color: '#52baf8',
+            })
+            this.rankChart.showLoading({
+                text: 'loading',
+                color: '#52baf8',
+            })
+            this.rankChart2.showLoading({
+                text: 'loading',
+                color: '#52baf8',
+            })
+        },
+
+        cancelChartLoading(){
+            this.myChart.hideLoading();
+            this.rankChart.hideLoading();
+            this.rankChart2.hideLoading();
+        },
     },
 }
 
