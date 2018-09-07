@@ -68,32 +68,23 @@ export default {
 
         statusList:[],
 
-        logName: '', //登录名
+        logName: '',    //登录名
         userStatus: '', //用户状态
-        dataCount: 0, // 搜索结果的数量
-        pageSize: 6, // 表格每页显示的数据条数
-        ajaxData: [], //搜索结果
+        dataCount: 0,   // 搜索结果的数量
+        pageSize: 6,    // 表格每页显示的数据条数
+        ajaxData: [],   //搜索结果
         accountData: [],
     }
   },
 
 
   methods: {
-
-    selectTab(selectedTab) {
-        this.tabs.forEach(tab => {
-          tab.isSelected = (tab.name == selectedTab.name);
-        })
-    },
-
     changepage(index) {
         var _start = (index - 1) * this.pageSize;
         var _end = index * this.pageSize;
         this.tableData = this.ajaxData.slice(_start, _end);
     },
-
   },
-
 
 }
 </script>
@@ -106,16 +97,6 @@ export default {
         margin:0;
         padding: 0;
         text-align: center;
-    }
-    .tabs>li {
-        float: left;
-        width: 33.333333%;
-    }
-    .tabs>li>.content {
-        height: 62px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
     .ivu-tabs-ink-bar {
         width: 150px;

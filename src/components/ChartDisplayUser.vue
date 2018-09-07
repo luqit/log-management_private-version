@@ -1,3 +1,6 @@
+//使用用户数图表组件
+//和ChartDisplayInput（输入字数）, ChartDisplayWord（调用次数）, ChartDisplayTime（录音时间）结构一致
+//四个图表组件引入setoption.js设置图表格式
 <template>
     <div id="container">
         <div class="chart-header">
@@ -8,10 +11,11 @@
             </div>
         </div> 
        
+        <!--  使用用户数按天显示的折线图 -->
         <div :class="{'is-active': isTable}">
             <div id="myChart" :style="{width: '100%', height: '300px'}"></div>
-            <!-- <div id="myChart"></div> -->
         </div>
+         <!--  使用用户数按天显示的列表详情 -->
         <div id="table-chart" v-if="isTable">
             <Table 
                 :columns="columns1" 
@@ -29,7 +33,7 @@
                 class="paging">
             </Page>
         </div>        
-        
+        <!--使用用户数按科室排名的直方图 -->
         <div class="chart-header">
             <div class="chart-title">科室用户数排名</div>
             <div style="float: right;">
@@ -43,6 +47,7 @@
 
 <script>
     var moment = require('moment');
+    // 设置图表格式
     import {setChartOption} from '../chart/setoption.js';
 
     export default {
@@ -66,15 +71,14 @@
         },
         data () {
             return {
-                myChart: {},
-                rankChart: {},
-                rankChart2: {},
-                dayXData: [],
-                dayYData: [],
-                sectionXData: [],
-                sectionYData: [], 
+                myChart: {},     //折线图
+                rankChart2: {},  //直方图
+                dayXData: [],    //折线图中的X轴数据
+                dayYData: [],    //折线图中的Y轴数据
+                sectionXData: [],//直方图中的X轴数据
+                sectionYData: [],//直方图中的X轴数据 
 
-                // table columns
+                // 表格列名
                 columns1:[
                     {
                         title: "序号",
@@ -105,19 +109,22 @@
                         key: "time",
                     },
                 ],
-                tableData: [],
-                dataCount: 0,
-                pageSize: 10,
-                ajaxData: [],
-                
-                // control the diaplay of chart or table
-                isTable: false,
+                tableData: [],  //列表中显示数据
+                dataCount: 0,   //数据总条数
+                pageSize: 10,   //每页的数据条数
+                ajaxData: [],   //获取的数据
+                isTable: false, //列表详情的显示
             }    
         },
 
         methods: {
-
+            /**
+             * 获取图表数据
+             * 将day数据,section数据排序
+             * 对图表和表格的数据进行设置
+             */
             getData(){
+                //设置图表加载效果
                 this.setChartLoading();
 
                 let postData = this.$qs.stringify({
@@ -134,12 +141,25 @@
                     var dataxx = [];
                     var datayy = [];
         
+                    //将键值日期排序
                     var sortedDays = Object.keys(rs.day).sort();
-                     
                     let allData = [];
+                    //处理图表数据
                     for(var i in sortedDays){
                         datax.push(sortedDays[i].slice(5));
                         datay.push(rs.day[sortedDays[i]].uidCount);
+                        this.ajaxData = allData;
+                        this.dataCount = allData.length;
+                        if (this.ajaxData.length < this.pageSize) {
+                            this.tableData = this.ajaxData;
+                        } else {
+                            this.tableData = this.ajaxData.slice(0, this.pageSize);
+                        }
+                    }
+                    this.dayXData = datax;
+                    this.dayYData = datay; 
+                    //处理列表详情数据
+                    for(var i in sortedDays.reverse()){
                         allData.push({
                             nums: parseInt(i) + 1,
                             day: sortedDays[i],
@@ -149,21 +169,12 @@
                             logcount: rs.day[sortedDays[i]].logCount,
                             time: rs.day[sortedDays[i]].stime
                         });                        
-                        this.ajaxData = allData;
-                        this.dataCount = allData.length;
-                        if (this.ajaxData.length < this.pageSize) {
-                            this.tableData = this.ajaxData;
-                        } else {
-                            this.tableData = this.ajaxData.slice(0, this.pageSize);
-                        }
-                    }
-                   
-                    this.dayXData = datax;
-                    this.dayYData = datay;                      
+                    }     
+                    //将键值科室名排序
                     var sortedSections = Object.keys(rs.section).sort(function(a, b) {
                         return rs.section[b].uidCount - rs.section[a].uidCount;
                     });
-          
+                    //处理图表数据
                     for (var index in sortedSections) {
                         if(sortedSections[index] == '-'){
                                 dataxx.push('其他');
@@ -176,10 +187,11 @@
 
                     this.sectionXData = dataxx;
                     this.sectionYData = datayy;                   
-                    
+                    //取消图表加载效果
                     this.cancelChartLoading();
+                    //显示图表
                     this.drawCharts();
-
+                    //控制图表宽度随窗口大小变化
                     window.onresize = () => {
                         this.myChart.resize()
                         this.rankChart2.resize()
@@ -193,7 +205,9 @@
                 });  
             },
 
-
+            /**
+             * 分页
+             */
             changepage(index) {
                 var _start = (index - 1) * this.pageSize;
                 var _end = index * this.pageSize;

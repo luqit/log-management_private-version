@@ -29,9 +29,10 @@
                         style="width: 130px; margin-left: 56px;">
                     </Input>
                     <Button type="primary" style="margin-left: 15px;" @click="searchDisplay()">搜索</Button>
+                    <Button type="ghost" style="margin-left: 15px;">导出</Button>
                 </div>
             </div>
-
+            <!-- 搜索结果 -->
             <div id="table">
                 <Table 
                     :loading="loading" 
@@ -93,40 +94,34 @@ export default {
         {
           title: "转录内容",
           key: "content",
-          // width: 400
         }
       ],
 
-        loading: true,
-        tableData: [],
-        dataCount: 0,
-        pageSize: 10,
-        ajaxData: [],
-        macValue: "",
+        loading: true, //表格loading控制
+        tableData: [], //表格中显示数据
+        dataCount: 0,  //数据总条数
+        pageSize: 10,  //每页数据条数
+        ajaxData: [],  //日志搜索结果
+        macValue: "",  //MAC地址
         
         startTimeOptions: {}, //开始日期设置
-        endTimeOptions: {}, //结束日期设置
-        startTime: "",
-        endTime: ""
+        endTimeOptions: {},   //结束日期设置
+        startTime: "",        //开始时间
+        endTime: ""           //结束时间
     };
   },
 
   methods: {
     /**
-     * When clicking the tab,
-     * add the bottom border
+     * 搜索结果
      */
-    selectTab(selectedTab) {
-      this.tabs.forEach(tab => {
-        tab.isSelected = tab.name == selectedTab.name;
-      });
-    },
-
     searchDisplay() {
       this.endTime = moment(this.endTime).endOf("day").format("YYYY-MM-DD HH:mm:ss");
       this.requestTableData(this.startTime, this.endTime, this.macValue);
     },
-
+    /**
+     * 从接口中获取对应开始时间，结束时间，MAC地址输入内容的日志
+     */
     requestTableData(st, et, uid) {
       this.loading = true;
       this.$http.get(process.env.API_HOST2+"flylog-search-web/customLogSearch/getWordCount.do", {
@@ -167,7 +162,10 @@ export default {
   
         });
     },
-
+		/**
+		 * 计算时间范围
+		 * 当前日期之前的preDays天至当前日期
+		 */
     computeTimeSlot(preDays){
 			let now = new Date();
 			let now2 = new Date();
@@ -178,21 +176,28 @@ export default {
 			this.startTime = startDate.toString();
 			this.endTime = endDate.toString();
 		},  
-
+    /**
+     * 实现分页
+     */
     changepage(index) {
       var _start = (index - 1) * this.pageSize;
       var _end = index * this.pageSize;
       this.tableData = this.ajaxData.slice(_start, _end);
     },
-
-    startTimeChange(e) { //设置开始时间
+		/**
+		 * 处理第二个Datepicker中的无效日期
+		 */
+    startTimeChange(e) {
       this.endTimeOptions = {
         disabledDate(endTime) {
           return moment(endTime).valueOf() < moment(e).valueOf() || endTime > Date.now()
         }
       }
-        },
-    endTimeChange(e) { //设置结束时间
+    },
+    /**
+		 * 处理第一个Datepicker中的无效日期
+		 */
+    endTimeChange(e) {
       this.startTimeOptions = {
         disabledDate(startTime) {
           return startTime > new Date(e) || startTime > Date.now()
@@ -218,24 +223,13 @@ export default {
     ul {
         list-style-type: none;
     }
-    ul,
-    li {
+    ul,li {
         margin: 0;
         padding: 0;
         text-align: center;
     }
     .ivu-table td {
         height: 60px;
-    }
-    .tabs > li {
-        float: left;
-        width: 33.333333%;
-    }
-    .tabs > li > .content {
-        height: 62px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
     .ivu-tabs-ink-bar {
         width: 150px;
@@ -255,7 +249,6 @@ export default {
         float: right;
         margin-top: 10px;
     }
-
     #tabpane {
         width: 100%;
         height: 62px;
@@ -270,12 +263,10 @@ export default {
         margin-right: 66px;
         height: 160px;
     }
-    #location,
-    #time {
+    #location, #time {
         margin-top: 10px;
         text-align: left;
     }
-
     #time {
         margin: 10px 0px;
         margin-bottom: 22px;

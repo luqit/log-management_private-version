@@ -34,9 +34,8 @@
 		</div>
 		
 		<br>
-
+		<!-- 搜索框 -->
 		<div id="container">
-
 			<div id="time">
 				<div class="item-left" >时间</div>
 				<DatePicker 
@@ -68,7 +67,7 @@
 					<Button type="primary" style="margin-left: 10px;" @click="searchDisplay()">搜索</Button>
 				</div>
         	</div>
-		
+		<!-- 切换表格的按钮 -->
 			<div>
 				<ButtonGroup>
 					<Button 
@@ -81,7 +80,7 @@
 				</ButtonGroup>	
 			</div>          
    	 	</div>
-
+		<!-- 搜索结果显示 -->
 		<div style="display: flex; justify-content: space-between;">
 			<div class="card" v-for="( value, index) in usage" :key='index' style="padding: 0px 0px;">
 			<div>{{value.name}}</div>
@@ -90,7 +89,7 @@
 			</div>
 		</div>
 		
-		<!-- Display three chasrts each time, use to pass parameters -->
+		<!-- 四组表格，点击切换 -->
       	<div class="canvas-for-chart" id="chart1">
 			<ChartDisplayUser v-if="chartClass[0].isSelected" :startdate="tableStartTime" :enddate="tableEndTime" ref="chart1"></ChartDisplayUser>
 			<ChartDisplayInput v-if="chartClass[1].isSelected" :startdate="tableStartTime" :enddate="tableEndTime" ref="chart2"></ChartDisplayInput>
@@ -204,12 +203,6 @@ export default {
 		}
 		],
 
-		category: ' ',
-		chartdata: ' ',
-		seletedProvince: ' ',
-		selectedCity: ' ',
-		selectedHospital: ' ',
-
 		startTimeOptions: {}, //开始日期设置
         endTimeOptions: {}, //结束日期设置
 		startTime: "",  //开始日期
@@ -218,25 +211,28 @@ export default {
 },
 
 	computed: {
+		// 统一开始和结束时间格式
 		tableStartTime: function(){
 			return moment(this.startTime).format("YYYY-MM-DD HH:mm:ss");
 		},
+		// 将结束时间设置为最后一天的结束时刻
 		tableEndTime: function(){
 			return moment(this.endTime).endOf("day").format("YYYY-MM-DD HH:mm:ss");
 		},
 	},
 
  	methods: {
-		selectTab(selectedTab) {
-			this.tabs.forEach(tab => {
-			tab.isSelected = (tab.name == selectedTab.name);})    
-		},
-
+		/**
+		 *  将选中图表的isSelected设置为true
+		 */
 		selectChart(selectedChart) {
 			this.chartClass.forEach(chart => {
 			chart.isSelected = (chart.name === selectedChart.name);})   
 		},
-
+		/**
+		 * 页面加载时显示总体的日志信息
+		 * 显示在首页最上方的标签中
+		 */
     	requestNum(){
 			this.$http.get(process.env.API_HOST2+'flylog-search-web/customLogSearch/getWordCount.do', {
 			params: {
@@ -302,7 +298,11 @@ export default {
 			.then(function () {
 			});  
 		},
-
+		/**
+		 * 搜索结果获取
+		 * 显示搜索框下方的标签内容
+		 * 处理图表和表格数据
+		 */
 		searchDisplay(){
 			//set end time to the end of the day to include data of the last day 
 			this.endTime = moment(this.endTime).endOf("day").format('YYYY-MM-DD HH:mm:ss');
@@ -334,7 +334,10 @@ export default {
 				// always executed
 			}); 					
 		},
-
+		/**
+		 * 计算时间范围
+		 * 当前日期之前的preDays天至当前日期
+		 */
 		computeTimeSlot(preDays){
 			let now = new Date();
 			let now2 = new Date();
@@ -345,7 +348,9 @@ export default {
 			this.startTime = startDate.toString();
 			this.endTime = endDate.toString();
 		},  
-
+		/**
+		 * 点击快捷键
+		 */
 		clickShortcut(index){
 			switch(index){
 				case(0):
@@ -366,53 +371,59 @@ export default {
 					break;
 			}
 		},
-			startTimeChange(e) { //设置开始时间
-				this.endTimeOptions = {
-					disabledDate(endTime) {
-						return moment(endTime).valueOf() < moment(e).valueOf() || endTime > Date.now()
-					}
+		/**
+		 * 处理第二个Datepicker中的无效日期
+		 */
+		startTimeChange(e) {
+			this.endTimeOptions = {
+				disabledDate(endTime) {
+					return moment(endTime).valueOf() < moment(e).valueOf() || endTime > Date.now()
 				}
-      		},
-			endTimeChange(e) { //设置结束时间
-				this.startTimeOptions = {
-					disabledDate(startTime) {
-						return startTime > new Date(e) || startTime > Date.now()
-					}
-				}
-			},
-	  },
-
-
-		created() {
-			this.computeTimeSlot(30);	
-			this.endTime = moment(this.endTime).endOf("day").format('YYYY-MM-DD HH:mm:ss');
-			this.startTimeChange(this.startTime);
-			this.endTimeChange(this.endTime);		
+			}
 		},
-	
-		mounted() {
+		/**
+		 * 处理第一个Datepicker中的无效日期
+		 */
+		endTimeChange(e) {
+			this.startTimeOptions = {
+				disabledDate(startTime) {
+					return startTime > new Date(e) || startTime > Date.now()
+				}
+			}
+		},
+	},
+
+
+	created() {
+		this.computeTimeSlot(30);//初始显示近30天的数据
+		this.endTime = moment(this.endTime).endOf("day").format('YYYY-MM-DD HH:mm:ss');
+		this.startTimeChange(this.startTime);//初始处理datepicker中的无效日期
+		this.endTimeChange(this.endTime);		
+	},
+
+	mounted() {
+		
+		this.usage[0].searchNum = 1;
+		let postData = this.$qs.stringify({
+			startTime: moment(this.startTime).format("YYYY-MM-DD HH:mm:ss"),
+			endTime: moment(this.endTime).format("YYYY-MM-DD HH:mm:ss"),
+			platform: 'siat',
+		});
+		this.$http.post(process.env.API_HOST2+'flylog-search-web/customLogSearch/getUidAndSectionCount.do', postData)
+		.then((response) => {
+			let res = response.data.data;
+			this.usage[1].searchNum = this.usage[2].searchNum = res.uidCount;
+			this.usage[3].searchNum = res.sectionCount;
+		})
+		.catch(function (error) {
+			console.log(error);
+		})
+		.then(function () {
 			
-			this.usage[0].searchNum = 1;
-			let postData = this.$qs.stringify({
-				startTime: moment(this.startTime).format("YYYY-MM-DD HH:mm:ss"),
-				endTime: moment(this.endTime).format("YYYY-MM-DD HH:mm:ss"),
-				platform: 'siat',
-			});
-			this.$http.post(process.env.API_HOST2+'flylog-search-web/customLogSearch/getUidAndSectionCount.do', postData)
-			.then((response) => {
-				let res = response.data.data;
-				this.usage[1].searchNum = this.usage[2].searchNum = res.uidCount;
-				this.usage[3].searchNum = res.sectionCount;
-			})
-			.catch(function (error) {
-				console.log(error);
-			})
-			.then(function () {
-				
-			}); 					
-			this.requestNum();
-			this.requestUserNum();	
-		} 
+		}); 					
+		this.requestNum();
+		this.requestUserNum();	
+	} 
 }
 </script>
 
@@ -441,16 +452,6 @@ export default {
 		margin:0;
 		padding: 0;
 		text-align: center;
-	}
-	.tabs>li {
-		float: left;
-		width: 33.333333%
-	}
-	.tabs>li>.content {
-		height: 62px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
 	}
 	.ivu-tabs-ink-bar {
 		width: 150px;
