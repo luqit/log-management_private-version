@@ -1,47 +1,32 @@
 <template>
     <div>
         <div id="container">
-
-            <div style="background: white; margin: 14px 0; height: 160px;">
-                <div id="tabpane">
-                    <ul class="tabs">
-                        <li v-for="(tab, index) in tabs" :key="index">
-                            <div 
-                                class="content" 
-                                @click="selectTab(tab)" 
-                                :class="{'is-active': tab.isSelected}">
-                                {{ tab.name }}
-                            </div>
-                        </li>
-                    </ul>    
-                </div>
-        
-                <div id="location" v-if="tabs[0].isSelected">
-                    <div class="item-left">省份</div>
-                    <Select v-model="province" size="large" style="width:100px" placeholder="">
-                        <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                    </Select>
-                    <div class="item-left">市区</div>
-                    <Select v-model="city" size="large" style="width:100px" placeholder="">
-                        <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                    </Select>
-                    <div class="item-left">单位</div>
-                    <Select v-model="hospital" size="large" style="width:100px" placeholder="">
-                        <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                    </Select>
-                    <Button type="primary" style="margin-left: 15px;">导入</Button>
-                    <br>
-                </div>
+            <div style="background: white; margin: 14px 0; height: 90px; padding-top: 15px;">
 
                 <div id="time">
                     <div class="item-left" >时间</div>
-                    <DatePicker v-model="startTime" class="date-picker" type="date" placeholder="选择日期"></DatePicker>
+                    <DatePicker 
+                      v-model="startTime" 
+                      class="date-picker" 
+                      type="date" 
+                      placeholder="选择日期"		
+                      :options="startTimeOptions"
+					            @on-change="startTimeChange">
+                    </DatePicker>
+
                     <div class="item-left">至</div>
-                    <DatePicker v-model="endTime" class="date-picker" type="date" placeholder="选择日期"></DatePicker>
+                    <DatePicker 
+                      v-model="endTime" 
+                      class="date-picker" 
+                      type="date" 
+                      placeholder="选择日期" 		
+                      :options="startTimeOptions"
+					            @on-change="startTimeChange">
+                    </DatePicker>
                     <Input 
                         v-model="macValue" 
                         placeholder="输入MAC等" 
-                        style="width: 100px; margin-left: 56px;">
+                        style="width: 130px; margin-left: 56px;">
                     </Input>
                     <Button type="primary" style="margin-left: 15px;" @click="searchDisplay()">搜索</Button>
                 </div>
@@ -63,8 +48,7 @@
                     @on-change="changepage" 
                     class="paging">
                 </Page>
-            </div>
-    
+            </div>  
          </div>
     </div>
 </template>
@@ -75,56 +59,9 @@ export default {
   name: "LogManagement",
   data() {
     return {
-      tabs: [
-        {
-          name: "公有云",
-          isSelected: true
-        },
-        {
-          name: "私有云",
-          isSelected: false
-        },
-        {
-          name: "总计",
-          isSelected: false
-        }
-      ],
-
-      cityList: [
-        {
-          value: "New York",
-          label: "New York"
-        },
-        {
-          value: "London",
-          label: "London"
-        },
-        {
-          value: "Sydney",
-          label: "Sydney"
-        },
-        {
-          value: "Ottawa",
-          label: "Ottawa"
-        },
-        {
-          value: "Paris",
-          label: "Paris"
-        },
-        {
-          value: "Canberra",
-          label: "Canberra"
-        }
-      ],
-
       province: "",
       city: "",
       hospital: "",
-      hospitalInTable:     
-      {
-          title: "医院",
-          key: "hospital"
-      },
 
       columns1: [
         {
@@ -135,38 +72,42 @@ export default {
         {
           title: "序号",
           key: "nums",
-          width: 100
-        },
-        {
-          title: "医院",
-          key: "hospital"
+          width: 70
         },
         {
           title: "科室",
-          key: "section"
+          key: "section",
+          width: 90
         },
         {
           title: "MAC地址",
-          key: "address"
+          key: "address",
+          width: 170
+       
         },
         {
           title: "时间",
-          key: "date"
+          key: "date",
+          width: 200
         },
         {
           title: "转录内容",
-          key: "content"
+          key: "content",
+          // width: 400
         }
       ],
 
         loading: true,
         tableData: [],
         dataCount: 0,
-        pageSize: 6,
+        pageSize: 10,
         ajaxData: [],
-        macValue: "F0-03-8C-35-D8-B1",
-        startTime: "2018-07-01 00:00:00",
-        endTime: "2018-07-27 00:00:00"
+        macValue: "",
+        
+        startTimeOptions: {}, //开始日期设置
+        endTimeOptions: {}, //结束日期设置
+        startTime: "",
+        endTime: ""
     };
   },
 
@@ -179,22 +120,16 @@ export default {
       this.tabs.forEach(tab => {
         tab.isSelected = tab.name == selectedTab.name;
       });
-      if(this.tabs[1].isSelected){ 
-        this.columns1.splice(2, 1);
-      }
-      if(this.tabs[0].isSelected || this.tabs[2].isSelected){ 
-        this.columns1.splice(2, 0, this.hospitalInTable); 
-      }
     },
 
     searchDisplay() {
+      this.endTime = moment(this.endTime).endOf("day").format("YYYY-MM-DD HH:mm:ss");
       this.requestTableData(this.startTime, this.endTime, this.macValue);
     },
 
     requestTableData(st, et, uid) {
-
-      this.$http
-        .get("/new/flylog-search-web/customLogSearch/getWordCount.do", {
+      this.loading = true;
+      this.$http.get(process.env.API_HOST2+"flylog-search-web/customLogSearch/getWordCount.do", {
           params: {
             startTime: moment(st).format("YYYY-MM-DD HH:mm:ss"),
             endTime: moment(et).format("YYYY-MM-DD HH:mm:ss"),
@@ -203,19 +138,18 @@ export default {
           }
         })
         .then(response => {
+          
           let res = response.data.data;
           let allData = [];
           for (var i in res.medicals) {
             allData.push({
               nums: parseInt(i) + 1,
-              hospital: "-",
-              section: res.Section,
-              address: this.macValue,
+              address: res.medicals[i].uid,
               date: res.medicals[i].timestamp,
               content: res.medicals[i].result,
               section: res.medicals[i].section
             });
-
+            }
             this.ajaxData = allData;
             this.dataCount = allData.length;
             if (this.ajaxData.length < this.pageSize) {
@@ -223,8 +157,8 @@ export default {
             } else {
               this.tableData = this.ajaxData.slice(0, this.pageSize);
             }
-          }
-            this.loading = false;
+
+          this.loading = false;
         })
         .catch(function(error) {
           console.log(error);
@@ -234,15 +168,47 @@ export default {
         });
     },
 
+    computeTimeSlot(preDays){
+			let now = new Date();
+			let now2 = new Date();
+			now.toString();
+			now2.toString();
+			let startDate = moment(now).startOf('day').subtract(preDays, 'days').format("YYYY-MM-DD HH:mm:ss");
+			let endDate = moment(now2).format("YYYY-MM-DD HH:mm:ss");
+			this.startTime = startDate.toString();
+			this.endTime = endDate.toString();
+		},  
+
     changepage(index) {
       var _start = (index - 1) * this.pageSize;
       var _end = index * this.pageSize;
       this.tableData = this.ajaxData.slice(_start, _end);
-    }
+    },
+
+    startTimeChange(e) { //设置开始时间
+      this.endTimeOptions = {
+        disabledDate(endTime) {
+          return moment(endTime).valueOf() < moment(e).valueOf() || endTime > Date.now()
+        }
+      }
+        },
+    endTimeChange(e) { //设置结束时间
+      this.startTimeOptions = {
+        disabledDate(startTime) {
+          return startTime > new Date(e) || startTime > Date.now()
+        }
+      }
+    },
+  },
+
+  created(){
+    this.computeTimeSlot(30);	
+    this.startTimeChange(this.startTime);
+    this.endTimeChange(this.endTime);	
   },
 
   mounted() {
-    this.requestTableData(this.startTime, this.endTime, this.macValue);
+    this.searchDisplay();
   }
 };
 </script>
@@ -278,7 +244,7 @@ export default {
         border-bottom: 3px solid #248fff;
     }
     .date-picker {
-        width: 100px;
+        width: 110px;
     }
     .item-left {
         display: inline-block;

@@ -4,20 +4,30 @@
             <div class="chart-title">调用次数总量统计</div>
             <div style="float: right;">
                 <Button type="primary">刷新</Button>
-                <Button>列表详情</Button>
+                <Button @click="isTable = !isTable;">列表详情</Button>
             </div>
         </div>
-        <div id="myChart" :style="{width: '100%', height: '300px'}"></div>
 
-        <div class="chart-header" :class="{'is-active': isdisplay}">
-            <div class="chart-title">医院调用次数排名</div>
-            <div style="float: right;">
-                <Button type="primary">刷新</Button>
-                <Button>列表详情</Button>
-            </div>
+        <div :class="{'is-active': isTable}">
+            <div id="myChart" :style="{width: '100%', height: '300px'}"></div>
         </div>
-        <div id="rankChart" :style="{width: '100%', height: '300px'}" :class="{'is-active': isdisplay}"></div>
+        <div id="table-chart" v-if="isTable">
+            <Table 
+                :columns="columns1" 
+                :data="tableData" 
+                size="large">
+            </Table>
 
+            <Page 
+                :total="dataCount" 
+                show-elevator 
+                show-total 
+                :page-size="pageSize"  
+                @on-change="changepage" 
+                size="small"
+                class="paging">
+            </Page>
+        </div>
         
         <div class="chart-header">
             <div class="chart-title">科室调用次数排名</div>
@@ -54,18 +64,56 @@
         data () {
             return {
                 myChart: {},
-                rankChart: {},
                 rankChart2: {},
                 dayXData: [],
                 dayYData: [],
                 sectionXData: [],
                 sectionYData: [],
+
+                columns1:[
+                    {
+                        title: "序号",
+                        key: "nums",
+                    },
+                    {
+                        title: "时间",
+                        key: "day",
+                    },
+                    {
+                        title: "使用设备数",
+                        key: "devices",
+                    },
+                    {
+                        title: "使用用户数",
+                        key: "users",
+                    },
+                    {
+                        title: "累计输入字数",
+                        key: "words",
+                    },
+                    {
+                        title: "累计调用次数",
+                        key: "logcount",
+                    },
+                    {
+                        title: "累计录音时间",
+                        key: "time",
+                    },
+                ],
+                tableData: [],
+                dataCount: 0,
+                pageSize: 10,
+                ajaxData: [],
+                
+                // control the diaplay of chart or table
+                isTable: false,
             }
         },
 
         methods: {
-
-            getData(){
+           
+            getData(){ 
+                console.log(this.enddate);
                 this.setChartLoading();
                 let postData = this.$qs.stringify({
 					startTime: this.startdate,
@@ -73,19 +121,37 @@
 					platform: 'siat',
                 });
                 
-                this.$http.post('/new/flylog-search-web/customLogSearch/getChart.do', postData)
+                this.$http.post(process.env.API_HOST2+'flylog-search-web/customLogSearch/getChart.do', postData)
                 .then((response) => {   
                     var rs = response.data.data;
+                    console.log(rs);
+                    
                     var datax = [];
                     var datay = [];
                     var dataxx = [];
                     var datayy = [];
 
                     var sortedDays = Object.keys(rs.day).sort();
-
+                    let allData = [];
                     for(var i in sortedDays){
                         datax.push(sortedDays[i].slice(5));
                         datay.push(rs.day[sortedDays[i]].logCount);
+                        allData.push({
+                            nums: parseInt(i) + 1,
+                            day: sortedDays[i],
+                            devices: rs.day[sortedDays[i]].uidCount,
+                            users: rs.day[sortedDays[i]].uidCount,
+                            words: rs.day[sortedDays[i]].wordCount,
+                            logcount: rs.day[sortedDays[i]].logCount,
+                            time: rs.day[sortedDays[i]].stime
+                        });                        
+                        this.ajaxData = allData;
+                        this.dataCount = allData.length;
+                        if (this.ajaxData.length < this.pageSize) {
+                            this.tableData = this.ajaxData;
+                        } else {
+                            this.tableData = this.ajaxData.slice(0, this.pageSize);
+                        }
                     }
                    
                     this.dayXData = datax;
@@ -112,7 +178,6 @@
                     
                     window.onresize = () => {
                         this.myChart.resize()
-                        this.rankChart.resize()
                         this.rankChart2.resize()
                     }
                 })
@@ -123,6 +188,12 @@
                     // always executed
                 });  
             },
+
+            changepage(index) {
+                var _start = (index - 1) * this.pageSize;
+                var _end = index * this.pageSize;
+                this.tableData = this.ajaxData.slice(_start, _end);
+            }
         },
         mounted(){
             this.getData();
@@ -150,16 +221,19 @@
     .is-active {
         display: none;
     }
+    .paging {
+        float: right;
+        margin-top: 10px;
+    }
     #container {
         background: white;
-        margin-top: 14px;
+        padding-top: 0px;
         max-width: 1535px;
-        box-shadow:0 0 10px #dfdfdf;
+        /* max-width: 100%; */
+        box-shadow:0 0 10px #dfdfdf; 
     }
-    #myChart {
-       width: 100%;
-    }
-    #rankChart {
-       width: 100%;
+    #table-chart {
+        display: inline-block;
+        width: 100%;
     }
 </style>

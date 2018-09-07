@@ -1,15 +1,7 @@
 <!--account management page -->
 <template>
     <div id="container">
-        <div style="margin: 14px 0; height: 130px; background: white;">
-            <div id="tabpane">
-                <ul class="tabs">
-                    <li v-for="(tab, index) in tabs" :key="index">
-                    <div class="content" @click="selectTab(tab)" :class="{'is-active': tab.isSelected}">{{tab.name}}</div>
-                    </li>
-                </ul>    
-            </div>
-
+        <div style="margin: 14px 0; height: 90px; background: white; padding-top: 13px;">
             <!-- The content of the submitted form will be binded to the variable 'logName' and 'userStatus'' -->
             <div style="margin-top: 17px;">
                 <div class="item-left">登录名称</div>
@@ -41,20 +33,6 @@ export default {
     name: 'ActManagment',
     data(){
     return{
-        tabs: [
-        {
-            name: "公有云", 
-            isSelected: true,
-        },
-        {
-            name: "私有云", 
-            isSelected: false,
-        },
-        {
-            name: "总计", 
-            isSelected: false,
-        },
-        ],
 
         columns: [
         {

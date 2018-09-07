@@ -23,9 +23,12 @@
 						<div class="navs" id="home" @click="routerSelect('/')">
 							<img src="@/assets/icon1-pressed.png">
 							<div class="menu-item">首页</div>
-							<Icon type="chevron-down"/>
+							<div  @click="isCollapse = !isCollapse">
+							<Icon type="chevron-down" v-if="isCollapse"/>
+							<Icon type="chevron-right" v-else/>
+							</div>
 						</div>
-						<div id="subnavs">
+						<div id="subnavs" v-if="isCollapse">
 							<div class="subnav" v-for="(sub, index) in submenu" :key='index'>
 								<img :src='sub.link'>
 								<div class="menu-item">{{sub.name}}</div>   
@@ -72,7 +75,8 @@ export default {
 			name: "科室使用统计",
 			link: require("@/assets/icon4-normal.png")
 		}
-		]
+		],
+		isCollapse: true,
 		}
 	},
 

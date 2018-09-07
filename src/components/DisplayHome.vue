@@ -14,14 +14,8 @@
 					<img :src='value.link'>
 				</div>
 
-				<div class="display-num" v-if="tabs[0].isSelected">
-					{{value.publicNum}}
-				</div>
-				<div class="display-num" v-else-if="tabs[1].isSelected">
+				<div class="display-num">
 					{{value.privateNum}}
-				</div>
-				<div class="display-num" v-else>
-					{{value.privateNum + value.publicNum}}
 				</div>
        	 	</div>
       	</div>
@@ -30,10 +24,7 @@
 			<div class="card" v-for="( value, index) in totalInput" :key='index' style="padding: 0px 0px;">
 				<div>{{value.name}}</div>
 				<div><img :src='value.link'></div>
-
-				<div class="display-num" v-if="tabs[0].isSelected">{{value.publicNum}}</div>
-				<div class="display-num" v-if="tabs[1].isSelected">{{value.privateNum}}</div>
-				<div class="display-num" v-if="tabs[2].isSelected">{{value.publicNum + value.privateNum}}</div>
+				<div class="display-num">{{value.privateNum}}</div>
 			</div>
 			<div class="card" style="visibility: hidden; padding: 0px 0px;">
 				<div>1</div>
@@ -45,44 +36,23 @@
 		<br>
 
 		<div id="container">
-			<div id="tabpane">
-				<ul class="tabs">
-					<li v-for="(tab, index) in tabs" :key="index">
-						<div class="content" @click="selectTab(tab)" :class="{'is-active': tab.isSelected}">
-							{{tab.name}}
-						</div>
-					</li>
-				</ul>    
-			</div>
-
-			<div id="location" v-if="tabs[0].isSelected">
-				<div class="item-left">省份</div>
-				<Select v-model="seletedProvince" size="large" style="width:100px" placeholder="">
-					<Option v-for="item in provinceList" :value="item" :key="item">{{ item }}</Option>
-				</Select>
-				<div class="item-left">市区</div>
-				<Select v-model="selectedCity" size="large" style="width:100px" placeholder="">
-					<Option v-for="item in cityList" :value="item" :key="item">{{ item }}</Option>
-				</Select>
-				<div class="item-left">单位</div>
-				<Select v-model="selectedHospital" size="large" style="width:100px" placeholder="">
-					<Option v-for="item in hospitalList" :value="item" :key="item">{{ item }}</Option>
-				</Select>
-				<br>
-			</div>
 
 			<div id="time">
 				<div class="item-left" >时间</div>
 				<DatePicker 
 					class="date-picker" 
 					type="date" 
+					:options="startTimeOptions"
+					@on-change="startTimeChange"
 					placeholder="选择日期"
 					v-model="startTime">
 				</DatePicker>
 				<div class="item-left">至</div>
 				<DatePicker 
 					class="date-picker" 
-					type="date" 
+					type="date"
+					:options="endTimeOptions" 
+					@on-change="endTimeChange"
 					placeholder="选择日期"
 					v-model="endTime">
 				</DatePicker>
@@ -122,10 +92,10 @@
 		
 		<!-- Display three chasrts each time, use to pass parameters -->
       	<div class="canvas-for-chart" id="chart1">
-			<ChartDisplayUser v-if="chartClass[0].isSelected" :startdate="tableStartTime" :enddate="tableEndTime" :isdisplay="tabs[1].isSelected" ref="chart1"></ChartDisplayUser>
-			<ChartDisplayInput v-if="chartClass[1].isSelected" :startdate="tableStartTime" :enddate="tableEndTime" :isdisplay="tabs[1].isSelected" ref="chart2"></ChartDisplayInput>
-			<ChartDisplayWord v-if="chartClass[2].isSelected" :startdate="tableStartTime" :enddate="tableEndTime" :isdisplay="tabs[1].isSelected" ref="chart3"></ChartDisplayWord>
-			<ChartDisplayTime v-if="chartClass[3].isSelected" :startdate="tableStartTime" :enddate="tableEndTime" :isdisplay="tabs[1].isSelected" ref="chart4"></ChartDisplayTime>
+			<ChartDisplayUser v-if="chartClass[0].isSelected" :startdate="tableStartTime" :enddate="tableEndTime" ref="chart1"></ChartDisplayUser>
+			<ChartDisplayInput v-if="chartClass[1].isSelected" :startdate="tableStartTime" :enddate="tableEndTime" ref="chart2"></ChartDisplayInput>
+			<ChartDisplayWord v-if="chartClass[2].isSelected" :startdate="tableStartTime" :enddate="tableEndTime" ref="chart3"></ChartDisplayWord>
+			<ChartDisplayTime v-if="chartClass[3].isSelected" :startdate="tableStartTime" :enddate="tableEndTime" ref="chart4"></ChartDisplayTime>
 		</div>
      
   	</div> 
@@ -157,99 +127,62 @@ export default {
 			name: "使用医院数",
 			link: require("@/assets/icon1.png"),
 			privateNum: 1,
-			publicNum: 1,
-			totalNum: null,
 			searchNum: 0,
 		},
 		{
 			name: "使用设备数",
 			link: require("@/assets/icon2.png"),
-			privateNum: 7820,
-			publicNum: 1,
-			totalNum: null,
+			privateNum: 0,
 			searchNum: 0,
 		},
 		{
 			name: "使用用户数",
 			link: require("@/assets/icon3.png"),
-			privateNum: 15220,
-			publicNum: 1,
-			totalNum: null,
+			privateNum: 0,
 			searchNum: 0,
 		},
 		{
 			name: "使用科室数",
 			link: require("@/assets/icon4.png"),
-			privateNum: 320,
-			publicNum: 1,
-			totalNum: null,
+			privateNum: 0,
 			searchNum: 0,
 		}
 		],
 
 		totalInput: [
 		{
-			name: "累计输入字数",
+			name: "累计输入字数（字）",
 			link:require("@/assets/icon5.png"),
 			privateNum: 0,
-			publicNum: 0,
-			totalNum: 0,
 		},
 		{
-			name: "累计调用次数",
+			name: "累计调用次数（次）",
 			link: require("@/assets/icon6.png"),
 			privateNum: 0,
-			publicNum: 0,
-			totalNum: 0,
 		},
 		{
-			name: "累计录音时间",
+			name: "累计录音时间（秒）",
 			link: require("@/assets/icon7.png"),
 			privateNum: 0,
-			publicNum: 0,
-			totalNum: 0,
 		}
-		],
-
-		provinceList: ['New York', 'London', 'Sydney', 'Ottawa', 'Paris', 'Canberra'],
-		cityList: ['New York', 'London', 'Sydney', 'Ottawa', 'Paris', 'Canberra'],
-		hospitalList: ['New York', 'London', 'Sydney', 'Ottawa', 'Paris', 'Canberra'],
-
-		tabs: [
-		{
-			name: "公有云", 
-			isSelected: true,
-		},
-		{
-			name: "私有云", 
-			isSelected: false,
-		},
-		{
-			name: "总计", 
-			isSelected: false,
-		},
 		],
 
 		btnList: [
 		{
 			name: "今日", 
-			methods: "clickShortcut1"
 		},
 		{
 			name: "昨日", 
-			methods: "clickShortcut2"
 		},
 		{
 			name: "近一周", 
-			methods: "clickShortcut3"
 		},
 		{
 			name: "近一月", 
-			methods: "clickShortcut4"
 		},
 		{
 			name: "近一年", 
-			methods: "clickShortcut5"},
+		}
 		],
 
 		chartClass: [
@@ -277,8 +210,10 @@ export default {
 		selectedCity: ' ',
 		selectedHospital: ' ',
 
-		startTime: "2018-07-01 00:00:00",
-		endTime: "2018-07-31 00:00:00",
+		startTimeOptions: {}, //开始日期设置
+        endTimeOptions: {}, //结束日期设置
+		startTime: "",  //开始日期
+		endTime: "",	//结束日期
   	}
 },
 
@@ -287,7 +222,7 @@ export default {
 			return moment(this.startTime).format("YYYY-MM-DD HH:mm:ss");
 		},
 		tableEndTime: function(){
-			return moment(this.endTime).format("YYYY-MM-DD HH:mm:ss")
+			return moment(this.endTime).endOf("day").format("YYYY-MM-DD HH:mm:ss");
 		},
 	},
 
@@ -303,10 +238,10 @@ export default {
 		},
 
     	requestNum(){
-			this.$http.get('/new/flylog-search-web/customLogSearch/getWordCount.do', {
+			this.$http.get(process.env.API_HOST2+'flylog-search-web/customLogSearch/getWordCount.do', {
 			params: {
-				startTime: moment(this.startTime).format("YYYY-MM-DD HH:mm:ss"),
-				endTime: moment(this.endTime).format("YYYY-MM-DD HH:mm:ss"),
+				startTime: "2017-01-01 00:00:00",
+				endTime: moment().format("YYYY-MM-DD HH:mm:ss"),
 				Uid: "",
 				platform: 'siat',
 			}
@@ -323,19 +258,21 @@ export default {
 				// always executed
       		});  
 
-
-			this.$http.get('/api/flylog-search-web/api/timeline.do', {
-			params: {
-				startTime: moment(this.startTime).format("YYYY-MM-DD HH:mm:ss"),
-				endTime: moment(this.endTime).format("YYYY-MM-DD HH:mm:ss"),
+			let postData = this.$qs.stringify({
+				startTime: "2017-01-01 00:00:00",
+				endTime: moment().format("YYYY-MM-DD HH:mm:ss"),
 				platform: 'siat',
-			}
-			})
+			});
+			
+			this.$http.post(process.env.API_HOST2+'flylog-search-web/customLogSearch/getChart.do', postData)
 			.then((response) => {
-				var nums = 0;
-				var lognums = response.data.logCount;
-				lognums.forEach(value => nums += value);
-				this.totalInput[1].privateNum = nums;
+				var rs = response.data.data;
+				let sum = 0;
+				var days = Object.keys(rs.day);
+				for(var i in days){
+					sum += rs.day[days[i]].logCount;
+				}
+				this.totalInput[1].privateNum = sum;
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -348,11 +285,12 @@ export default {
 
 		requestUserNum(){
 			let postData = this.$qs.stringify({
-				startTime: '2000-01-01 00:00:00',
+				startTime: '2010-01-01 00:00:00',
 				endTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+				// endTime: '2018-08-24 00:00:00',
 				platform: 'siat',
             });
-			this.$http.post('/new/flylog-search-web/customLogSearch/getUidAndSectionCount.do', postData)
+			this.$http.post(process.env.API_HOST2+'flylog-search-web/customLogSearch/getUidAndSectionCount.do', postData)
 			.then((response) => {
 				let rs = response.data.data;
 				this.usage[1].privateNum = this.usage[2].privateNum = rs.uidCount;
@@ -366,56 +304,35 @@ export default {
 		},
 
 		searchDisplay(){
-			if(this.tabs[0].isSelected){
-				this.$http.get('/api/flylog-search-web/api/timeline.do', {
-				params: {
-					startTime: moment(this.startTime).format("YYYY-MM-DD HH:mm:ss"),
-					endTime: moment(this.endTime).format("YYYY-MM-DD HH:mm:ss"),
-					platform: 'siat',
-				}
-				})
-				.then((response) => {
-					var nums = 0;
-					var lognums = response.data.logCount;
-					lognums.forEach(value => nums += value);
-					this.usage[2].searchNum = nums;
-				})
-				.catch(function (error) {
-					console.log(error);
-				})
-				.then(function () {
-					// always executed
-				}); 
-			}
+			//set end time to the end of the day to include data of the last day 
+			this.endTime = moment(this.endTime).endOf("day").format('YYYY-MM-DD HH:mm:ss');
 			
-			if(this.tabs[1].isSelected){
-				this.usage[0].searchNum = 1;
-				let postData = this.$qs.stringify({
-					startTime: moment(this.startTime).format("YYYY-MM-DD HH:mm:ss"),
-					endTime: moment(this.endTime).format("YYYY-MM-DD HH:mm:ss"),
-					platform: 'siat',
-				});
-				this.$http.post('/new/flylog-search-web/customLogSearch/getUidAndSectionCount.do', postData)
-				.then((response) => {
-					let res = response.data.data;
-					this.usage[1].searchNum = this.usage[2].searchNum = res.uidCount;
-					this.usage[3].searchNum = res.sectionCount;
-					if(this.chartClass[0].isSelected) 
-						this.$refs.chart1.getData();
-					if(this.chartClass[1].isSelected)
-						this.$refs.chart2.getData();
-					if(this.chartClass[2].isSelected)
-						this.$refs.chart3.getData();
-					if(this.chartClass[3].isSelected)
-						this.$refs.chart4.getData();
-				})
-				.catch(function (error) {
-					console.log(error);
-				})
-				.then(function () {
-					// always executed
-				}); 				
-			}	
+			this.usage[0].searchNum = 1;
+			let postData = this.$qs.stringify({
+				startTime: moment(this.startTime).format("YYYY-MM-DD HH:mm:ss"),
+				endTime: moment(this.endTime).format("YYYY-MM-DD HH:mm:ss"),
+				platform: 'siat',
+			});
+			this.$http.post(process.env.API_HOST2+'flylog-search-web/customLogSearch/getUidAndSectionCount.do', postData)
+			.then((response) => {
+				let res = response.data.data;
+				this.usage[1].searchNum = this.usage[2].searchNum = res.uidCount;
+				this.usage[3].searchNum = res.sectionCount;
+				if(this.chartClass[0].isSelected) 
+					this.$refs.chart1.getData();
+				if(this.chartClass[1].isSelected)
+					this.$refs.chart2.getData();
+				if(this.chartClass[2].isSelected)
+					this.$refs.chart3.getData();
+				if(this.chartClass[3].isSelected)
+					this.$refs.chart4.getData();
+			})
+			.catch(function (error) {
+				console.log(error);
+			})
+			.then(function () {
+				// always executed
+			}); 					
 		},
 
 		computeTimeSlot(preDays){
@@ -448,13 +365,54 @@ export default {
 					this.computeTimeSlot(365);
 					break;
 			}
-    	},
-  	},
-  
-	mounted() {
-		this.requestNum();
-		this.requestUserNum();	
-	} 
+		},
+			startTimeChange(e) { //设置开始时间
+				this.endTimeOptions = {
+					disabledDate(endTime) {
+						return moment(endTime).valueOf() < moment(e).valueOf() || endTime > Date.now()
+					}
+				}
+      		},
+			endTimeChange(e) { //设置结束时间
+				this.startTimeOptions = {
+					disabledDate(startTime) {
+						return startTime > new Date(e) || startTime > Date.now()
+					}
+				}
+			},
+	  },
+
+
+		created() {
+			this.computeTimeSlot(30);	
+			this.endTime = moment(this.endTime).endOf("day").format('YYYY-MM-DD HH:mm:ss');
+			this.startTimeChange(this.startTime);
+			this.endTimeChange(this.endTime);		
+		},
+	
+		mounted() {
+			
+			this.usage[0].searchNum = 1;
+			let postData = this.$qs.stringify({
+				startTime: moment(this.startTime).format("YYYY-MM-DD HH:mm:ss"),
+				endTime: moment(this.endTime).format("YYYY-MM-DD HH:mm:ss"),
+				platform: 'siat',
+			});
+			this.$http.post(process.env.API_HOST2+'flylog-search-web/customLogSearch/getUidAndSectionCount.do', postData)
+			.then((response) => {
+				let res = response.data.data;
+				this.usage[1].searchNum = this.usage[2].searchNum = res.uidCount;
+				this.usage[3].searchNum = res.sectionCount;
+			})
+			.catch(function (error) {
+				console.log(error);
+			})
+			.then(function () {
+				
+			}); 					
+			this.requestNum();
+			this.requestUserNum();	
+		} 
 }
 </script>
 
@@ -501,7 +459,7 @@ export default {
 		border-bottom: 3px solid #248fff;
 	}
 	.date-picker {
-		width: 100px;
+		width: 110px;
 	}
 	.item-left {
 		display: inline-block; 
@@ -525,7 +483,8 @@ export default {
 		min-width: 1008px;
 		margin-right: 66px;
 		margin-top: 2px;
-		height: 204px;
+		padding-top:20px;
+		height: 130px;
 	}
 	#location, #time {
 		margin-top: 10px;
